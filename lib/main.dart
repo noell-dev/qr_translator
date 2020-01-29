@@ -86,14 +86,21 @@ class MyHomePage extends StatefulWidget {
 
 
 class _MyHomePageState extends State<MyHomePage> {
-  String result = " ";
+  Widget result = Text("Kein Code gescannt");
 
   void _showOverlay(BuildContext context) async {
-      result = await Navigator.push(
+      final code = await Navigator.push(
         context,
         // Create the SelectionScreen in the next step.
         MaterialPageRoute(builder: (context) => QROverlay())
       );
+      if (code != null) {
+        setState(() {
+          result = Text("Barcode: $code");
+        });
+      } else {
+        result = Text("Kein Code gescannt");
+      }
   }
 
   @override
@@ -130,10 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'This is the Barcode:',
-            ),
-            Text(result),
+            result,
           ],
         ),
       ),

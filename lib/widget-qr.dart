@@ -33,104 +33,148 @@ class _QrWidget extends State<QrWidget> {
 
   @override
   Widget build(BuildContext context) {
-      return  Column(
-        children: <Widget>[
-        // Controls for the Camera Widget
-        Expanded(
-          flex: 1,
-          child: FittedBox(
-            fit: BoxFit.contain,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    // ######  Flash Button
-                    Container(
-                      margin: EdgeInsets.all(8.0),
-                      child: RaisedButton(
-                        onPressed: () {
-                          if (controller != null) {
-                            controller.toggleFlash();
-                            if (_isFlashOn(flashState)) {
-                              setState(() {
-                                flashState = flash_off;
-                                flashImage = flash_off_i;
-                              });
-                            } else {
-                              setState(() {
-                                flashState = flash_on;
-                                flashImage = flash_on_i;
-                              });
-                            }
-                          }
-                        },
-                        child: flashImage
-                      ),
-                    ),
-                    // ######  Camera Flip Button
-                    Container(
-                      margin: EdgeInsets.all(8.0),
-                      child: RaisedButton(
-                        onPressed: () {
-                          if (controller != null) {
-                            controller.flipCamera();
+    return  Column(
+      children: <Widget>[
+      // Camera (QR-Scan) Widget
+      Expanded(
+        flex: 5,
+        child:  QRView(
+          key: qrKey,
+          onQRViewCreated: _onQRViewCreated,
+        ),
+      ),
+      // Controls for the Camera Widget
+      Expanded(
+        flex: 1,
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  // ######  Flash Button
+                  Container(
+                    margin: EdgeInsets.all(8.0),
+                    child: RaisedButton(
+                      onPressed: () {
+                        if (controller != null) {
+                          controller.toggleFlash();
+                          if (_isFlashOn(flashState)) {
                             setState(() {
-                              camStatus = cam_on;
-                              camStatusImage = cam_on_i;
-                            });
-                          }
-                        },
-                        child: Icon(Icons.switch_camera)
-                      ),
-                    ),
-                    // ######  Pause Camera Button
-                    Container(
-                      margin: EdgeInsets.all(8.0),
-                      child: RaisedButton(
-                        onPressed: () {
-                          if(_isCameraPaused(camStatus)){
-                            controller?.resumeCamera();
-                            setState(() {
-                              camStatus = cam_on;
-                              camStatusImage = cam_on_i;
+                              flashState = flash_off;
+                              flashImage = flash_off_i;
                             });
                           } else {
-                            controller?.pauseCamera();
                             setState(() {
-                              camStatus = cam_paused;
-                              camStatusImage = cam_paused_i;
+                              flashState = flash_on;
+                              flashImage = flash_on_i;
                             });
                           }
-                        },
-                        child: camStatusImage
-                      ),
+                        }
+                      },
+                      child: flashImage
                     ),
-                    Container(
-                      margin: EdgeInsets.all(8.0),
-                      child: RaisedButton(
-                        onPressed: () => Navigator.pop(context, "Abbruch!"),
-                        child: Icon(Icons.close),
-                      ),
+                  ),
+                  // ######  Camera Flip Button
+                  Container(
+                    margin: EdgeInsets.all(8.0),
+                    child: RaisedButton(
+                      onPressed: () {
+                        if (controller != null) {
+                          controller.flipCamera();
+                          setState(() {
+                            camStatus = cam_on;
+                            camStatusImage = cam_on_i;
+                          });
+                        }
+                      },
+                      child: Icon(Icons.switch_camera)
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                  // ######  Pause Camera Button
+                  Container(
+                    margin: EdgeInsets.all(8.0),
+                    child: RaisedButton(
+                      onPressed: () {
+                        if(_isCameraPaused(camStatus)){
+                          controller?.resumeCamera();
+                          setState(() {
+                            camStatus = cam_on;
+                            camStatusImage = cam_on_i;
+                          });
+                        } else {
+                          controller?.pauseCamera();
+                          setState(() {
+                            camStatus = cam_paused;
+                            camStatusImage = cam_paused_i;
+                          });
+                        }
+                      },
+                      child: camStatusImage
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-        // Camera (QR-Scan) Widget
-        Expanded(
-          flex: 5,
-          child:  QRView(
-            key: qrKey,
-            onQRViewCreated: _onQRViewCreated,
+      ),
+      Expanded(
+        flex: 1,
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.all(8.0),
+                    child: Text(
+                      "Code: $qrText",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-      ],
-      );
+      ),
+      Expanded(
+        flex: 1,
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.all(8.0),
+                    child: RaisedButton(
+                      onPressed: () => Navigator.pop(context, qrText),
+                      child: Icon(Icons.check),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(8.0),
+                    child: RaisedButton(
+                      onPressed: () => Navigator.pop(context, null),
+                      child: Icon(Icons.close),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    ],
+    );
   }
 
   _isFlashOn(String current) {
@@ -145,10 +189,9 @@ class _QrWidget extends State<QrWidget> {
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
-      Navigator.pop(context, scanData);
-      /*setState(() {
+      setState(() {
         qrText = scanData;
-      });*/
+      });
     });
   }
 
