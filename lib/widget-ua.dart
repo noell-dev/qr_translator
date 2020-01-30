@@ -16,7 +16,7 @@ class UaWidget extends StatefulWidget {
 
 
 class _UaWidget extends State<UaWidget> {
-
+  // ToDo: Get the JSON file from configurable remote and check for version updates!
   Map<String, dynamic> scheme = jsonDecode(jsonString);
 
   @override
