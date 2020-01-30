@@ -134,12 +134,23 @@ class _QrWidget extends State<QrWidget> {
                   Container(
                     margin: EdgeInsets.all(8.0),
                     child: Text(
-                      "Code: $qrText",
+                      "Code:",
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
                 ],
               ),
+              Row(
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.all(8.0),
+                    child: Text(
+                      "$qrText",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  )
+                ],
+              )
             ],
           ),
         ),
