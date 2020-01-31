@@ -11,18 +11,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 const jsonFilename = "scheme.json";
 
 
-// ToDo: implement secure function to fetch JSON Data
-Future<String> fetchJSON(http.Client client, adress) async {
+// Future to test JSON
+Future<String> testAdress(http.Client client, adress) async {
+  final prefs = await SharedPreferences.getInstance();
+
   try {
     final _response = await http.get(adress);
     try {
       var x = json.decode(_response.body) as Map<String, dynamic>;
-      JsonStorage().writeJsonStore(_response.body);
+      prefs.setString('adress', adress);
       return "OK";
     } on FormatException {
       return throw("Zieldatei nicht korrekt formatiert!"); // Todo: Translate
     }
-  } catch (err) {
+  } catch (e) {
     return throw('Adresse inkorrekt!'); // Todo: Translate
   }
 }
@@ -87,7 +89,7 @@ class _FormWidget extends State<FormWidget> {
   Widget build(BuildContext context) {
 
     return FutureBuilder<String>(
-      future: fetchJSON(http.Client(), this.adress),
+      future: testAdress(http.Client(), this.adress),
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         Color _dataColor = Colors.grey;
         var _error = Text('');
@@ -131,6 +133,113 @@ class _FormWidget extends State<FormWidget> {
   }
 }
 
+// ToDo: ReadWidget
+class ReadWidget extends StatefulWidget {
+  @override
+  _ReadWidget createState(){
+    return _ReadWidget();
+  }
+}
+
+// ToDo: ReadWidget
+class _ReadWidget extends State<ReadWidget> {
+  Future _compareVersion(version) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('localVersion') == version;
+  }
+
+  Future _updateLocalJSON(rawjson, version) async {
+    final prefs = await SharedPreferences.getInstance();
+    JsonStorage().writeJsonStore(rawjson);
+    prefs.setString('localVersion', version);
+  }
+
+  Future<Map<String, dynamic>> _theComparer() async {
+    try {
+      final _rawJson = await _fetchJSON(http.Client());
+      final _decodedJson = json.decode(_rawJson) as Map<String, dynamic>;
+      final _newVersionAvailable = _compareVersion(_decodedJson['version']);
+      Map<String, dynamic> ouput = {'versionAvailable': _newVersionAvailable, 'rawJson': _rawJson, 'decodedJson': _decodedJson};
+      
+      return ouput ;
+    } catch (e) {
+      return throw("Error");
+    }
+  }
+
+  Future<String> _fetchJSON(http.Client client) async {
+    final prefs = await SharedPreferences.getInstance();
+    String _adress = prefs.getString('adress');
+    try {
+      final _response = await http.get(_adress);
+      try {
+        var x = json.decode(_response.body) as Map<String, dynamic>;
+        return _response.body;
+      } on FormatException {
+        return throw("Zieldatei nicht korrekt formatiert!"); // Todo: Translate
+      }
+    } catch (err) {
+      return throw('Adresse inkorrekt!'); // Todo: Translate
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var _widget = <Widget>[
+          Text('Nichts zum ANzeigen',)  
+        ];
+    return FutureBuilder<Map<String, dynamic>>(
+      future: _theComparer(),
+      builder: (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+        Color _dataColor = Colors.grey;
+        var _data;
+        var _rawJson;
+        var _decodedJson;
+        var _newVersionAvailable; 
+
+        if (snapshot.hasData) {
+          _dataColor = Colors.green;
+          _data = snapshot.data;
+          _rawJson = _data["rawJson"];
+          _decodedJson = _data["decodedJson"];
+          _newVersionAvailable = _data["newVersionAvailable"];
+
+          if (_newVersionAvailable) {
+            _widget = <Widget>[
+              Text("Neue Version Verfügbar: ${_decodedJson['Version']}"),
+              RaisedButton(
+                color: _dataColor,
+                onPressed: () {
+                  _updateLocalJSON(_rawJson, _decodedJson['Version']);
+                },
+                child: Text('Neue Version aktivieren'), // Todo: Translate
+              ),
+            ];
+          } else {
+            _widget = <Widget>[
+              Text("Aktuell installierte Version: ${_decodedJson['Version']}"),
+            ];
+          }
+        }
+
+        if (snapshot.hasError) {
+          _dataColor = Colors.red;
+          _widget = <Widget>[
+            Text(
+              '${snapshot.error}',
+              style: TextStyle(color: _dataColor)
+            )  
+          ];
+        }
+      return Column(
+          children: _widget
+        );
+      }
+    );
+  }
+}
+
+
 // ToDo: Create Widgets for the Settings Screen
 class SettingsWidget extends StatefulWidget {
   _SettingsWidget createState() => _SettingsWidget();
@@ -154,7 +263,7 @@ class _SettingsWidget extends State<SettingsWidget> {
               ],
             ),
             FormWidget(),
-            // ToDo: ReadWidget(),
+            ReadWidget(),
           ],
         )
       ),
