@@ -1,31 +1,30 @@
-import 'package:bacnet_translator/widget-ua.dart';
-import 'package:bacnet_translator/widget-qr.dart';
 import 'package:flutter/material.dart';
 
-var no_code = Center(
-    // Center is a layout widget. It takes a single child and positions it
-    // in the middle of the parent.
+import 'package:bacnet_translator/widget-ua.dart';
+import 'package:bacnet_translator/widget-qr.dart';
+import 'package:bacnet_translator/widget-settings.dart';
+
+
+var noCode = Center(
     child: Column(
-      // Column is also a layout widget. It takes a list of children and
-      // arranges them vertically. By default, it sizes itself to fit its
-      // children horizontally, and tries to be as tall as its parent.
-      //
-      // Invoke "debug painting" (press "p" in the console, choose the
-      // "Toggle Debug Paint" action from the Flutter Inspector in Android
-      // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-      // to see the wireframe for each widget.
-      //
-      // Column has various properties to control how it sizes itself and
-      // how it positions its children. Here we use mainAxisAlignment to
-      // center the children vertically; the main axis here is the vertical
-      // axis because Columns are vertical (the cross axis would be
-      // horizontal).
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Text("Kein Code gescannt"),
+        Text("Kein Code gescannt"), // Todo: Translation
       ],
     ),
   );
+var noFile = Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          "Kein Schema", // Todo: Translation
+          style: TextStyle(color: Colors.red),
+        ),
+      ],
+    ),
+  );
+
 
 class QROverlay extends StatelessWidget {
 
@@ -71,35 +70,23 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'BACnet Translator',
+      title: 'BACnet Übersetzer', // ToDo: Translate 
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'BACnet Translator'),
+      home: MyHomePage(title: 'BACnet Übersetzer', storage: JsonStorage()), // ToDo: Translate 
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  final JsonStorage storage;
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
+  MyHomePage({
+    Key key,
+    this.title,
+    @required this.storage
+  }) : super(key: key);
 
   final String title;
 
@@ -108,7 +95,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Widget result = no_code;
+  bool _hideButton = true;
+  String _jsonString = "file_error";
+  Widget _result = noFile;
 
   void _showOverlay(BuildContext context) async {
       final code = await Navigator.push(
@@ -118,13 +107,37 @@ class _MyHomePageState extends State<MyHomePage> {
       );
       if (code != null) {
         setState(() {
-          result = UaWidget(adress: code);
+          _result = UaWidget(
+            adress: code,
+            jsonString: _jsonString
+          );
         });
       } else {
         setState(() {
-          result = no_code;
+          _result = noCode;
         });
       }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.storage.readJsonStore().then((String json) {
+      if (json == "file_error") {
+        setState(() {
+          _hideButton = true;
+          _jsonString = json;
+          _result = noFile;
+        });
+      } else {
+        setState(() {
+          _hideButton = false;
+          _jsonString = json;
+          _result = noCode;
+        });
+      }
+
+    });
   }
 
   @override
@@ -140,27 +153,31 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
-      ),
-      body: result,
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: <Widget>[
-          FloatingActionButton(
-            mini: true,
-            onPressed: () => _showOverlay(context),
-            tooltip: 'Settings',
-            child: Icon(Icons.settings),
-            heroTag: 1,
-          ), // This trailing comma makes auto-formatting nicer for build methods.
-          FloatingActionButton(
-            onPressed: () => _showOverlay(context),
-            tooltip: 'Scan Code',
-            child: Icon(Icons.search),
-            heroTag: 2,
-          ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              Navigator.push(
+                context, MaterialPageRoute(builder: (context) => SettingsWidget()));
+            },
+          )
         ],
-      )
+      ),
+      body: _result,
+      floatingActionButton: _hideButton ? FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context, MaterialPageRoute(builder: (context) => SettingsWidget()));
+        },
+        tooltip: 'Einstellungen', // ToDo: Translate
+        child: Icon(Icons.settings),
+        heroTag: 1,
+      ) : FloatingActionButton(
+        onPressed: () => _showOverlay(context),
+        tooltip: 'Code Scannen', // ToDo: Translate
+        child: Icon(Icons.search),
+        heroTag: 1,
+      ),
     );
   }
 }

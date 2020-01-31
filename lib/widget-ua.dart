@@ -2,13 +2,18 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 
-
 class UaWidget extends StatefulWidget {
   final String adress;
-
+  final String jsonString;
+  
   final fields = new List();
 
-  UaWidget({Key key, @required this.adress}) : super(key: key);
+  UaWidget({
+    Key key,
+    @required this.adress,
+    @required this.jsonString
+  }) : super(key: key);
+
 
   @override
   _UaWidget createState() => _UaWidget();
@@ -16,13 +21,13 @@ class UaWidget extends StatefulWidget {
 
 
 class _UaWidget extends State<UaWidget> {
-  // ToDo: Get the JSON file from configurable remote and check for version updates!
-  Map<String, dynamic> scheme = jsonDecode(jsonString);
-
   @override
   Widget build(BuildContext context) {
+    // ToDo: Get the JSON file from configurable remote and check for version updates!
+    Map<String, dynamic> scheme = jsonDecode(widget.jsonString);
     String seperator = scheme["Trennzeichen"];
     List splittedAdress = widget.adress.split(seperator);
+    
     for (var item in splittedAdress) {
       var searchItem = item.replaceAll(RegExp(r'[0-9]'), '');
       if (scheme["Keys"].containsKey(searchItem)) {
