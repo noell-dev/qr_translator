@@ -1,16 +1,16 @@
 # bacnet_translator
 
-A new Flutter project.
+This Project serves to translate BACnet Object-Names following a certain Naming-Scheme into a Human-Readable Format.
+In most larger corporate Environments a Scheme is implemented to make sure Object-Names are Unique and are describing the assigned HVAC Device.
+Since these Schemes have to be able to handle lots of different cases, many different Object-Names and can't be really long, they rely heavily on abbreviations and therefore are hard to remember or differentiate for Human-Beings.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+This App serves the Purpose to make these strings Human-Readable with the help of a scheme definition, which has to be loaded from a configurable remote. Since most corporates don't want their schemes to be out there for everyone it is possible that this remote is only available when using a VPN or in a corporate WiFi.
+The Scheme then is stored offline for usage without the availablity of the remote.
 
-A few resources to get you started if this is your first Flutter project:
+## ToDo:
+ - [ ] Let the user enter Object-Names by hand
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Needs Fixing:
+ - [ ] Nearly everything related to Settings
+  
