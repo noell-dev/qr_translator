@@ -16,6 +16,6 @@ The Scheme then is stored offline for usage without the availablity of the remot
  - [ ] Nearly everything related to Settings
 
 ## License:
-This Project is Licensed under the Open Source [MIT License](https://github.com/noelli/bacnet_translator/blob/master/LICENSE)
+My code is Licensed under the Open Source [MIT License](https://github.com/noelli/bacnet_translator/blob/master/LICENSE)
 
 This app is built using [Flutter](https://github.com/flutter/flutter), therefore the corresponding [License](https://github.com/flutter/flutter/blob/master/LICENSE) applies for their code.
