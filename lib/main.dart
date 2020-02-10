@@ -3,27 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:bacnet_translator/widget-ua.dart';
 import 'package:bacnet_translator/widget-qr.dart';
 import 'package:bacnet_translator/widget-settings.dart';
+import 'package:bacnet_translator/localization.dart';
 
-
-var noCode = Center(
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Text("Kein Code gescannt"), // Translate
-      ],
-    ),
-  );
-var noFile = Center(
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Text(
-          "Kein Schema", // Translate
-          style: TextStyle(color: Colors.red),
-        ),
-      ],
-    ),
-  );
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 
 class QROverlay extends StatelessWidget {
@@ -70,11 +52,21 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'BACnet Übersetzer', // Translate 
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('en'), // English
+        const Locale('de'), // German
+      ],
+
+      title: "Test", //AppLocalizations.of(context).translate('title')
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'BACnet Übersetzer', storage: JsonStorage()), // Translate 
+      home: MyHomePage(title: "Test", storage: JsonStorage()),
     );
   }
 }
@@ -88,16 +80,19 @@ class MyHomePage extends StatefulWidget {
     @required this.storage
   }) : super(key: key);
 
-  final String title;
+  String title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
   bool _hideButton = true;
   String _jsonString = "file_error";
-  Widget _result = noFile;
+  String _result = "noFile";
+  String _code;
+  bool _codeAvailable = false;
 
   void _showOverlay(BuildContext context) async {
       final code = await Navigator.push(
@@ -107,14 +102,13 @@ class _MyHomePageState extends State<MyHomePage> {
       );
       if (code != null) {
         setState(() {
-          _result = UaWidget(
-            adress: code,
-            jsonString: _jsonString
-          );
+          _codeAvailable = true;
+          _code = code;
         });
       } else {
         setState(() {
-          _result = noCode;
+          _codeAvailable = false;
+          _result = "noCode";
         });
       }
   }
@@ -126,13 +120,13 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {
           _hideButton = true;
           _jsonString = json;
-          _result = noFile;
+          _result = "noFile";
         });
       } else {
         setState(() {
           _hideButton = false;
           _jsonString = json;
-          _result = noCode;
+          _result = "noCode";
         });
       }
     });
@@ -157,6 +151,8 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+    widget.title = AppLocalizations.of(context).translate('title');
+
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -171,17 +167,27 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         ],
       ),
-      body: _result,
+      body: _codeAvailable ? UaWidget(
+            adress: _code,
+            jsonString: _jsonString
+          ) : Center(
+            child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(AppLocalizations.of(context).translate(_result)),
+            ],
+          ),
+        ),
       floatingActionButton: _hideButton ? FloatingActionButton(
         onPressed: () {
           _navigateSettings();
         },
-        tooltip: 'Einstellungen', // Translate
+        tooltip: AppLocalizations.of(context).translate("settings"),
         child: Icon(Icons.settings),
         heroTag: 1,
       ) : FloatingActionButton(
         onPressed: () => _showOverlay(context),
-        tooltip: 'Code Scannen', // Translate
+        tooltip: AppLocalizations.of(context).translate("scanCode"),
         child: Icon(Icons.search),
         heroTag: 1,
       ),

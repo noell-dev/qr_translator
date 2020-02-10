@@ -13,7 +13,7 @@ The Scheme then is stored offline for usage without the availablity of the remot
  - [ ] Let the user enter Object-Names by hand
 
 ## Needs Fixing:
- - [ ] Nearly everything related to Settings
+ - [x] Nearly everything related to Settings
 
 ## License:
 My code is Licensed under the Open Source [MIT License](https://github.com/noelli/bacnet_translator/blob/master/LICENSE)

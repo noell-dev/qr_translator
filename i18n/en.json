@@ -1,0 +1,17 @@
+{
+    "title": "BACnet Translator",
+    "noCode": "No code scanned",
+    "noFile": "No scheme provided",
+    "settings": "Settings",
+    "scanCode": "Sccan Code",
+    "testing": "Testing ...",
+    "good": "Everything Fine!",
+    "newVersion": "New Version Available",
+    "formatError": "Target-File not well formatted!",
+    "adressError": "Adress is incorrect!",
+    "activateVersion": "activate new Version",
+    "testFile": "Test file",
+    "enterAdress": "Enter Adress: (Beginning with HTTP(s)://)",
+    "localVersion": "Local Version",
+    "onlineVersion": "Online Version"
+}

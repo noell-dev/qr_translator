@@ -1,0 +1,17 @@
+{
+    "title": "BACnet Übersetzer",
+    "noCode": "Kein Code gescannt",
+    "noFile": "Kein Schema",
+    "settings": "Einstellungen",
+    "scanCode": "Code scannen",
+    "testing": "Teste ...",
+    "good": "Alles Gut!",
+    "newVersion": "Neue Version verfügbar",
+    "formatError": "Zieldatei nicht korrekt formatiert!",
+    "adressError": "Adresse inkorrekt!",
+    "activateVersion": "Neue Version aktivieren",
+    "testFile": "Datei Testen",
+    "enterAdress": "Adresse angeben: (Beginnt mit HTTP(s)://)",
+    "localVersion": "Lokale Version",
+    "onlineVersion": "Online Version"
+}

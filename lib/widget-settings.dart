@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:bacnet_translator/localization.dart';
 
 const jsonFilename = "scheme.json";
 
@@ -41,7 +42,6 @@ class JsonStorage {
 
       return contents;
     } catch (e) {
-      // ToDo: if encountering an error, return ?
       return "file_error";
     }
   }
@@ -58,7 +58,7 @@ class FormWidget extends StatefulWidget {
 class _FormWidget extends State<FormWidget> {
   final _formKey = GlobalKey<FormState>();
   String _adress;
-  String _error = "Testing ..."; // Translate
+  String _error = "Testing ...";
   String _localVersion;
   String _rawJson;
   Map<String, dynamic> _decodedJson;
@@ -80,7 +80,7 @@ class _FormWidget extends State<FormWidget> {
     prefs.setString('localVersion', this._decodedJson['Version']);
     setState(() {
       _dataColor = Colors.green;
-      _error = 'Alles Gut!'; // Translate
+      _error = AppLocalizations.of(context).translate('good');
       _newVersionAvailable = false;
     });
     _getPrefs();
@@ -103,10 +103,10 @@ class _FormWidget extends State<FormWidget> {
         setState(() {
           if (_compare) {
             _dataColor = Colors.yellow;
-            _error = 'Neue Version verfügbar'; // Translate
+            _error = AppLocalizations.of(context).translate('newVersion');
           } else {
             _dataColor = Colors.green;
-            _error = 'Alles Gut!'; // Translate
+            _error = AppLocalizations.of(context).translate('good');
           }
           _rawJson = _response.body;
           _decodedJson = _decoded;
@@ -116,14 +116,14 @@ class _FormWidget extends State<FormWidget> {
       } on FormatException {
         setState(() {
           _dataColor = Colors.red;
-          _error = 'Zieldatei nicht korrekt formatiert!'; // Translate
+          _error = AppLocalizations.of(context).translate('formatError');
           _adressCorrect = false;
         });
       }
     } catch (e) {
       setState(() {
         _dataColor = Colors.red;
-        _error = 'Adresse inkorrekt!'; // Translate
+        _error = AppLocalizations.of(context).translate('adressError');
         _adressCorrect = false;
       }); 
     }
@@ -161,7 +161,7 @@ class _FormWidget extends State<FormWidget> {
         onPressed: () {
           _updateLocalJSON();
         },
-        child: Text('Neue Version aktivieren'), // Translate
+        child: Text(AppLocalizations.of(context).translate('activateVersion')),
       );
     } else {
       _button = RaisedButton(
@@ -172,7 +172,7 @@ class _FormWidget extends State<FormWidget> {
           });
           _fetchJSON(http.Client(), this._adress);
         },
-        child: Text('Datei Testen'), // Translate
+        child: Text(AppLocalizations.of(context).translate('testFile')),
       );
     }
 
@@ -187,8 +187,8 @@ class _FormWidget extends State<FormWidget> {
             _error,
             style: TextStyle(color: _dataColor)
           ),
-          Text("Lokale Version: ${this._localVersion}"),
-          this._adressCorrect ? Text("Online Version: ${this._decodedJson['Version']}") : Text("Online Version: ---"),
+          Text("${AppLocalizations.of(context).translate('localVersion')}: ${this._localVersion}"),
+          this._adressCorrect ? Text("${AppLocalizations.of(context).translate('onlineVersion')}: ${this._decodedJson['Version']}") : Text("${AppLocalizations.of(context).translate('onlineVersion')}: ---"),
           _button,
         ],
       ),
@@ -210,14 +210,14 @@ class _SettingsWidget extends State<SettingsWidget> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text("Einstellungen"), // Translate
+        title: Text(AppLocalizations.of(context).translate('settings')),
       ),
       body: Center(
         child: Column(
           children: <Widget>[
             Row(
               children: <Widget>[
-                Text("Adresse angeben: (Beginnt mit HTTP(s)://)") // Translate
+                Text(AppLocalizations.of(context).translate('enterAdress'))
               ],
             ),
             FormWidget(),

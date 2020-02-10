@@ -23,7 +23,6 @@ class UaWidget extends StatefulWidget {
 class _UaWidget extends State<UaWidget> {
   @override
   Widget build(BuildContext context) {
-    // ToDo: Get the JSON file from configurable remote and check for version updates!
     Map<String, dynamic> scheme = jsonDecode(widget.jsonString);
     String seperator = scheme["Trennzeichen"];
     List splittedAdress = widget.adress.split(seperator);
