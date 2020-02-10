@@ -119,9 +119,8 @@ class _MyHomePageState extends State<MyHomePage> {
       }
   }
 
-  @override
-  void initState() {
-    super.initState();
+
+  void _readJson() {
     widget.storage.readJsonStore().then((String json) {
       if (json == "file_error") {
         setState(() {
@@ -136,8 +135,18 @@ class _MyHomePageState extends State<MyHomePage> {
           _result = noCode;
         });
       }
-
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _readJson();
+  }
+
+  void _navigateSettings() async {
+    await Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsWidget()));
+    _readJson();
   }
 
   @override
@@ -157,8 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
-              Navigator.push(
-                context, MaterialPageRoute(builder: (context) => SettingsWidget()));
+              _navigateSettings();
             },
           )
         ],
@@ -166,8 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: _result,
       floatingActionButton: _hideButton ? FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context, MaterialPageRoute(builder: (context) => SettingsWidget()));
+          _navigateSettings();
         },
         tooltip: 'Einstellungen', // Translate
         child: Icon(Icons.settings),
