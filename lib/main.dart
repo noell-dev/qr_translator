@@ -9,7 +9,7 @@ var noCode = Center(
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Text("Kein Code gescannt"), // Todo: Translation
+        Text("Kein Code gescannt"), // Translate
       ],
     ),
   );
@@ -18,7 +18,7 @@ var noFile = Center(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Text(
-          "Kein Schema", // Todo: Translation
+          "Kein Schema", // Translate
           style: TextStyle(color: Colors.red),
         ),
       ],
@@ -70,11 +70,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'BACnet Übersetzer', // ToDo: Translate 
+      title: 'BACnet Übersetzer', // Translate 
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'BACnet Übersetzer', storage: JsonStorage()), // ToDo: Translate 
+      home: MyHomePage(title: 'BACnet Übersetzer', storage: JsonStorage()), // Translate 
     );
   }
 }
@@ -169,12 +169,12 @@ class _MyHomePageState extends State<MyHomePage> {
           Navigator.push(
             context, MaterialPageRoute(builder: (context) => SettingsWidget()));
         },
-        tooltip: 'Einstellungen', // ToDo: Translate
+        tooltip: 'Einstellungen', // Translate
         child: Icon(Icons.settings),
         heroTag: 1,
       ) : FloatingActionButton(
         onPressed: () => _showOverlay(context),
-        tooltip: 'Code Scannen', // ToDo: Translate
+        tooltip: 'Code Scannen', // Translate
         child: Icon(Icons.search),
         heroTag: 1,
       ),
