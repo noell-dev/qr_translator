@@ -7,7 +7,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="bacnet_translator"
+        android:label="BACnet Translator"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
@@ -45,4 +45,5 @@
             android:value="2" />
     </application>
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>
