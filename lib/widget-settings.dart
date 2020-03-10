@@ -200,10 +200,32 @@ class _FormWidget extends State<FormWidget> {
 
 // ###################### Main Settings Widget ##########################################
 class SettingsWidget extends StatefulWidget {
+
+  
   _SettingsWidget createState() => _SettingsWidget();
 }
 
 class _SettingsWidget extends State<SettingsWidget> {
+  bool _littleWidget = false;
+
+  Future _toggleLittleWidget(value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool("littleWidget", value);
+  }
+
+  Future _getPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _littleWidget = prefs.getBool("littleWidget");
+    });
+  }
+
+@override
+  void initState() {
+    _getPrefs();
+    super.initState();
+  }
+
   @override
   Widget build (BuildContext context) {
   return Scaffold(
@@ -221,7 +243,17 @@ class _SettingsWidget extends State<SettingsWidget> {
               ],
             ),
             FormWidget(),
-          ],
+            SwitchListTile(
+                  title: Text(AppLocalizations.of(context).translate('toggleLittleWidget')),
+                  value: _littleWidget,
+                  onChanged: (bool value) {
+                    _toggleLittleWidget(value);
+                    setState(() {
+                      _littleWidget = value;
+                    });
+                  },
+                ),
+              ]
         )
       ),
     );
