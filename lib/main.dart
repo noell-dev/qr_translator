@@ -97,20 +97,10 @@ class _MyHomePageState extends State<MyHomePage> {
   void _showOverlay(BuildContext context) async {
       final code = await Navigator.push(
         context,
-        // Create the SelectionScreen in the next step.
+        // Create the QROverlay in the next step.
         MaterialPageRoute(builder: (context) => QROverlay())
       );
-      if (code != null) {
-        setState(() {
-          _codeAvailable = true;
-          _code = code;
-        });
-      } else {
-        setState(() {
-          _codeAvailable = false;
-          _result = "noCode";
-        });
-      }
+      callback(code);
   }
 
 
@@ -136,6 +126,20 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _readJson();
+  }
+
+  void callback(String code) {
+      if (code != null) {
+        setState(() {
+          _codeAvailable = true;
+          _code = code;
+        });
+      } else {
+        setState(() {
+          _codeAvailable = false;
+          _result = "noCode";
+        });
+      }
   }
 
   void _navigateSettings() async {
@@ -167,7 +171,8 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         ],
       ),
-      body: _codeAvailable ? UaWidget(
+      body: new Stack(children: <Widget>[
+          _codeAvailable ? UaWidget(
             adress: _code,
             jsonString: _jsonString
           ) : Center(
@@ -178,6 +183,12 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
         ),
+        new Align(
+          alignment: Alignment.bottomRight,
+          child: LittleQrWidget(callback)//LittleOverlay()
+        )
+      ]
+      ),
       floatingActionButton: _hideButton ? FloatingActionButton(
         onPressed: () {
           _navigateSettings();

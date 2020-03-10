@@ -13,6 +13,83 @@ const cam_paused = "CAM PAUSED";
 const cam_paused_i = Icon(Icons.play_arrow);
 
 
+class LittleQrWidget extends StatefulWidget {
+  Function callback;
+
+  LittleQrWidget(this.callback);
+
+  @override
+  _LittleQrWidget createState() => _LittleQrWidget();
+}
+
+
+class _LittleQrWidget extends State<LittleQrWidget> {
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  var camStatus = cam_paused;
+  var camStatusImage = cam_paused_i;
+  QRViewController controller;
+
+
+  @override
+  Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+    var width = screenSize.width;
+    var height = screenSize.height;
+    controller?.pauseCamera();
+    return Container(
+            width: width/2,
+            height: height/4,
+            child: Stack(
+              children: <Widget>[
+              QRView(
+                key: qrKey,
+                onQRViewCreated: _onQRViewCreated,
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: IconButton(
+                  icon: camStatusImage,
+                  onPressed: () {
+                    if(_isCameraPaused(camStatus)){
+                      controller?.resumeCamera();
+                      setState(() {
+                        camStatus = cam_on;
+                        camStatusImage = cam_on_i;
+                      });
+                    } else {
+                      controller?.pauseCamera();
+                      setState(() {
+                        camStatus = cam_paused;
+                        camStatusImage = cam_paused_i;
+                      });
+                    }
+                  },
+                ),
+              )
+            ]
+            )
+          );
+  }
+
+  void _onQRViewCreated(QRViewController controller) {
+    this.controller = controller;
+    controller.scannedDataStream.listen((scanData) {
+      this.widget.callback(scanData);
+    });
+  }
+
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
+  }
+  _isCameraPaused(String current) {
+    return cam_paused == current;
+  }
+}
+
+
+
 class QrWidget extends StatefulWidget {
   @override
   _QrWidget createState() => _QrWidget();
