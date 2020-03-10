@@ -5,6 +5,7 @@ import 'package:bacnet_translator/widget-qr.dart';
 import 'package:bacnet_translator/widget-settings.dart';
 import 'package:bacnet_translator/localization.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 
@@ -87,8 +88,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
-  bool _hideButton = true;
+  bool _littleWidget = false;
+  bool _settingsButton = true;
   String _jsonString = "file_error";
   String _result = "noFile";
   String _code;
@@ -108,13 +109,13 @@ class _MyHomePageState extends State<MyHomePage> {
     widget.storage.readJsonStore().then((String json) {
       if (json == "file_error") {
         setState(() {
-          _hideButton = true;
+          _settingsButton = true;
           _jsonString = json;
           _result = "noFile";
         });
       } else {
         setState(() {
-          _hideButton = false;
+          _settingsButton = false;
           _jsonString = json;
           _result = "noCode";
         });
@@ -122,10 +123,19 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future _getPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _littleWidget = prefs.getBool("littleWidget");
+    });
+  }
+
+
   @override
   void initState() {
     super.initState();
     _readJson();
+    _getPrefs();
   }
 
   void callback(String code) {
@@ -149,6 +159,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    _getPrefs();
+    Widget _codeWidget;
+    Widget _body;
+    Widget _fab;
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -157,39 +171,36 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     widget.title = AppLocalizations.of(context).translate('title');
 
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              _navigateSettings();
-            },
-          )
-        ],
-      ),
-      body: new Stack(children: <Widget>[
-          _codeAvailable ? UaWidget(
-            adress: _code,
-            jsonString: _jsonString
-          ) : Center(
-            child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(AppLocalizations.of(context).translate(_result)),
-            ],
-          ),
+    if (_codeAvailable) {
+      _codeWidget = UaWidget(
+          adress: _code,
+          jsonString: _jsonString
+        );
+    } else {
+      _codeWidget = Center(
+          child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(AppLocalizations.of(context).translate(_result)),
+          ],
         ),
-        new Align(
-          alignment: Alignment.bottomRight,
-          child: LittleQrWidget(callback)//LittleOverlay()
-        )
-      ]
-      ),
-      floatingActionButton: _hideButton ? FloatingActionButton(
+      );
+    }
+
+    if (_littleWidget) {
+      _body =  new Stack(
+        children: <Widget>[
+          _codeWidget,
+          new Align(
+            alignment: Alignment.bottomRight,
+            child: LittleQrWidget(callback)
+          )
+        ]
+      );
+      _fab = Container();
+    } else {
+      _body = _codeWidget;
+      _fab = _settingsButton ? FloatingActionButton(
         onPressed: () {
           _navigateSettings();
         },
@@ -201,7 +212,23 @@ class _MyHomePageState extends State<MyHomePage> {
         tooltip: AppLocalizations.of(context).translate("scanCode"),
         child: Icon(Icons.search),
         heroTag: 1,
+      );
+    }
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              _navigateSettings();
+            },
+          )
+        ],
       ),
+      body: _body, 
+      floatingActionButton: _fab,
     );
   }
 }
