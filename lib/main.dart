@@ -125,9 +125,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future _getPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _littleWidget = prefs.getBool("littleWidget");
-    });
+    if (prefs.containsKey("littleWidget")) {
+      setState(() {
+        _littleWidget = prefs.getBool("littleWidget");
+      });
+    }
   }
 
 
