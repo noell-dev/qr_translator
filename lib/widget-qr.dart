@@ -3,14 +3,44 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 
 const flash_on = "FLASH ON";
-const flash_on_i = Icon(Icons.flash_on);
+const flash_on_i = Icon(Icons.flash_on, color: Colors.white,);
 const flash_off = "FLASH OFF";
-const flash_off_i = Icon(Icons.flash_off);
+const flash_off_i = Icon(Icons.flash_off, color: Colors.white,);
 
 const cam_on = "CAM ON";
-const cam_on_i = Icon(Icons.pause);
+const cam_on_i = Icon(Icons.pause, color: Colors.white,);
 const cam_paused = "CAM PAUSED";
-const cam_paused_i = Icon(Icons.play_arrow);
+const cam_paused_i = Icon(Icons.play_arrow, color: Colors.white,);
+
+
+class LittleQrWidget extends StatefulWidget {
+  Function callback;
+
+  LittleQrWidget(this.callback);
+
+  @override
+  _LittleQrWidget createState() => _LittleQrWidget();
+}
+
+
+class _LittleQrWidget extends State<LittleQrWidget> {
+
+  void callback(String code) {
+    this.widget.callback(code);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+    var width = screenSize.width;
+    var height = screenSize.height;
+    return Container(
+            width: width/2,
+            height: height/4,
+            child: CameraView(callback)
+          );
+  }
+}
 
 
 class QrWidget extends StatefulWidget {
@@ -22,10 +52,12 @@ class QrWidget extends StatefulWidget {
 class _QrWidget extends State<QrWidget> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   var qrText = "";
-  var flashState = flash_on;
-  var flashImage = flash_on_i;
-  var camStatus = cam_on;
-  var camStatusImage = cam_on_i;
+
+  void callback(String code) {
+    setState(() {
+      qrText = code;
+    });
+  }
 
   QRViewController controller;
 
@@ -38,89 +70,7 @@ class _QrWidget extends State<QrWidget> {
       // Camera (QR-Scan) Widget
       Expanded(
         flex: 5,
-        child:  QRView(
-          key: qrKey,
-          onQRViewCreated: _onQRViewCreated,
-        ),
-      ),
-      // Controls for the Camera Widget
-      Expanded(
-        flex: 1,
-        child: FittedBox(
-          fit: BoxFit.contain,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  // ######  Flash Button
-                  Container(
-                    margin: EdgeInsets.all(8.0),
-                    child: RaisedButton(
-                      onPressed: () {
-                        if (controller != null) {
-                          controller.toggleFlash();
-                          if (_isFlashOn(flashState)) {
-                            setState(() {
-                              flashState = flash_off;
-                              flashImage = flash_off_i;
-                            });
-                          } else {
-                            setState(() {
-                              flashState = flash_on;
-                              flashImage = flash_on_i;
-                            });
-                          }
-                        }
-                      },
-                      child: flashImage
-                    ),
-                  ),
-                  // ######  Camera Flip Button
-                  Container(
-                    margin: EdgeInsets.all(8.0),
-                    child: RaisedButton(
-                      onPressed: () {
-                        if (controller != null) {
-                          controller.flipCamera();
-                          setState(() {
-                            camStatus = cam_on;
-                            camStatusImage = cam_on_i;
-                          });
-                        }
-                      },
-                      child: Icon(Icons.switch_camera)
-                    ),
-                  ),
-                  // ######  Pause Camera Button
-                  Container(
-                    margin: EdgeInsets.all(8.0),
-                    child: RaisedButton(
-                      onPressed: () {
-                        if(_isCameraPaused(camStatus)){
-                          controller?.resumeCamera();
-                          setState(() {
-                            camStatus = cam_on;
-                            camStatusImage = cam_on_i;
-                          });
-                        } else {
-                          controller?.pauseCamera();
-                          setState(() {
-                            camStatus = cam_paused;
-                            camStatusImage = cam_paused_i;
-                          });
-                        }
-                      },
-                      child: camStatusImage
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+        child:  CameraView(callback)
       ),
       Expanded(
         flex: 1,
@@ -187,22 +137,107 @@ class _QrWidget extends State<QrWidget> {
     ],
     );
   }
+}
 
-  _isFlashOn(String current) {
-    return flash_on == current;
-  }
+// ###########################################
+// ###    Camera View with Controls        ###
+// ###########################################
+
+class CameraView extends StatefulWidget {
+  Function callback;
+
+  CameraView(this.callback);
+
+  @override
+  _CameraView createState() => _CameraView();
+}
 
 
-  _isCameraPaused(String current) {
-    return cam_paused == current;
+class _CameraView extends State<CameraView> {
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  var flashState = flash_on;
+  var flashImage = flash_on_i;
+  var camStatus = cam_on;
+  var camStatusImage = cam_on_i;
+
+  QRViewController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: <Widget>[
+        QRView(
+          key: qrKey,
+          onQRViewCreated: _onQRViewCreated,
+        ),
+        Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            color: Colors.black.withOpacity(0.2),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                IconButton(
+                  icon: flashImage,
+                  onPressed: () {
+                  if (controller != null) {
+                    controller.toggleFlash();
+                    if (_isFlashOn(flashState)) {
+                      setState(() {
+                        flashState = flash_off;
+                        flashImage = flash_off_i;
+                      });
+                    } else {
+                      setState(() {
+                        flashState = flash_on;
+                        flashImage = flash_on_i;
+                      });
+                    }
+                  }
+                },
+                ),
+                IconButton(
+                  icon: camStatusImage,
+                  onPressed: () {
+                    if(_isCameraPaused(camStatus)){
+                      controller?.resumeCamera();
+                      setState(() {
+                        camStatus = cam_on;
+                        camStatusImage = cam_on_i;
+                      });
+                    } else {
+                      controller?.pauseCamera();
+                      setState(() {
+                        camStatus = cam_paused;
+                        camStatusImage = cam_paused_i;
+                      });
+                    }
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.switch_camera, color: Colors.white,),
+                  onPressed: () {
+                    if (controller != null) {
+                      controller.flipCamera();
+                      setState(() {
+                        camStatus = cam_on;
+                        camStatusImage = cam_on_i;
+                      });
+                    }
+                  },
+                )
+              ],
+            ) 
+          )
+        )
+      ]
+    );
   }
 
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
-      setState(() {
-        qrText = scanData;
-      });
+      this.widget.callback(scanData);
     });
   }
 
@@ -210,5 +245,13 @@ class _QrWidget extends State<QrWidget> {
   void dispose() {
     controller?.dispose();
     super.dispose();
+  }
+
+  _isFlashOn(String current) {
+    return flash_on == current;
+  }
+
+  _isCameraPaused(String current) {
+    return cam_paused == current;
   }
 }

@@ -13,5 +13,6 @@
     "testFile": "Datei Testen",
     "enterAdress": "Adresse angeben: (Beginnt mit HTTP(s)://)",
     "localVersion": "Lokale Version",
-    "onlineVersion": "Online Version"
+    "onlineVersion": "Online Version",
+    "toggleLittleWidget": "Scannen über kleines Fenster"
 }

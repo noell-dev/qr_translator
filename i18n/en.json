@@ -13,5 +13,6 @@
     "testFile": "Test file",
     "enterAdress": "Enter Adress: (Beginning with HTTP(s)://)",
     "localVersion": "Local Version",
-    "onlineVersion": "Online Version"
+    "onlineVersion": "Online Version",
+    "toggleLittleWidget": "Scan with little Camera"
 }
