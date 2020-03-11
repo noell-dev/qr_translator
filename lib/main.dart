@@ -106,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
   void _readJson() {
-    widget.storage.readJsonStore().then((String json) {
+    widget.storage.readJsonStore(true).then((String json) {
       if (json == "file_error") {
         setState(() {
           _settingsButton = true;
@@ -121,6 +121,27 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       }
     });
+  }
+// ############################################################
+// ToDo: Append Strings to File function
+// ToDo: Switch in Header Bar to enable savong of Adresses
+// ToDo: functions to trigger saving of adresses in Parser  
+// ############################################################
+
+  void _appendStringToFile(String _stringToParse, bool isScheme) {
+    String _originalJson;
+
+
+    widget.storage.readJsonStore(false).then((String json) {
+      if (json == "file_error"){
+
+      } else {
+
+      }
+    });
+
+
+    JsonStorage().writeJsonStore(_stringToParse, true);
   }
 
   Future _getPrefs() async {

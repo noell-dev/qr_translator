@@ -9,12 +9,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:bacnet_translator/localization.dart';
 
-const jsonFilename = "scheme.json";
-
+const schemeFilename = "scheme.json";
+const saveFilename = "save.json";
 
 
 // Storage Actions: Done!
 class JsonStorage {
+
+  String _filename;
   // Get the Local Path on both Platforms
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
@@ -24,16 +26,26 @@ class JsonStorage {
   // Provide the json File as a File Object to read and Write
   Future<File> get _localFile async {
     final path = await _localPath;
-    return File('$path/$jsonFilename');
+    return File('$path/$_filename');
   }
 
   // Write newly fetched JSON String
-  Future<File> writeJsonStore(String jsonString) async {
+  Future<File> writeJsonStore(String jsonString, bool isScheme) async {
+    if (isScheme) {
+      this._filename = schemeFilename;
+    } else {
+      this._filename = saveFilename;
+    }
     final file = await _localFile;
     return file.writeAsString('$jsonString');
   }
 
-  Future<String> readJsonStore() async {
+  Future<String> readJsonStore(bool isScheme) async {
+    if (isScheme) {
+      this._filename = schemeFilename;
+    } else {
+      this._filename = saveFilename;
+    }
     try {
       final file = await _localFile;
 
@@ -74,9 +86,9 @@ class _FormWidget extends State<FormWidget> {
   }
 
   // Update the json on filesystem
-  Future _updateLocalJSON() async {
+  Future _updateLocalScheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    JsonStorage().writeJsonStore(this._rawJson);
+    JsonStorage().writeJsonStore(this._rawJson, true);
     prefs.setString('localVersion', this._decodedJson['Version']);
     setState(() {
       _dataColor = Colors.green;
@@ -88,7 +100,7 @@ class _FormWidget extends State<FormWidget> {
 
 
   // Future to test JSON
-  Future _fetchJSON(http.Client client, adress) async {
+  Future _fetchScheme(http.Client client, adress) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (adress == null) {
       adress = prefs.getString("adress");
@@ -148,7 +160,7 @@ class _FormWidget extends State<FormWidget> {
 @override
   void initState() {
     _getPrefs();
-    _fetchJSON(http.Client(), _adress);
+    _fetchScheme(http.Client(), _adress);
     super.initState();
   }
 
@@ -159,7 +171,7 @@ class _FormWidget extends State<FormWidget> {
       _button = RaisedButton(
         color: _dataColor,
         onPressed: () {
-          _updateLocalJSON();
+          _updateLocalScheme();
         },
         child: Text(AppLocalizations.of(context).translate('activateVersion')),
       );
@@ -170,7 +182,7 @@ class _FormWidget extends State<FormWidget> {
           setState(() {
             this._adress = _controller.text;
           });
-          _fetchJSON(http.Client(), this._adress);
+          _fetchScheme(http.Client(), this._adress);
         },
         child: Text(AppLocalizations.of(context).translate('testFile')),
       );
