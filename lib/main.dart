@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:bacnet_translator/widget-ua.dart';
-import 'package:bacnet_translator/widget-qr.dart';
-import 'package:bacnet_translator/widget-settings.dart';
+import 'package:bacnet_translator/widget/list-code-translation.dart';
+import 'package:bacnet_translator/widget/qr-scanner.dart';
+import 'package:bacnet_translator/widget/settings.dart';
 import 'package:bacnet_translator/localization.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -183,7 +183,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     _getPrefs();
-    Widget _codeWidget;
+    Widget _centerWidget;
     Widget _body;
     Widget _fab;
     // This method is rerun every time setState is called, for instance as done
@@ -195,12 +195,12 @@ class _MyHomePageState extends State<MyHomePage> {
     widget.title = AppLocalizations.of(context).translate('title');
 
     if (_codeAvailable) {
-      _codeWidget = UaWidget(
+      _centerWidget = ListCodeTranslationWidget(
           adress: _code,
           jsonString: _jsonString
         );
     } else {
-      _codeWidget = Center(
+      _centerWidget = Center(
           child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -213,7 +213,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_littleWidget) {
       _body =  new Stack(
         children: <Widget>[
-          _codeWidget,
+          _centerWidget,
           new Align(
             alignment: Alignment.bottomRight,
             child: LittleQrWidget(callback)
@@ -222,7 +222,7 @@ class _MyHomePageState extends State<MyHomePage> {
       );
       _fab = Container();
     } else {
-      _body = _codeWidget;
+      _body = _centerWidget;
       _fab = _settingsButton ? FloatingActionButton(
         onPressed: () {
           _navigateSettings();
