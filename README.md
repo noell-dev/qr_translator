@@ -16,6 +16,7 @@ Since one can imagine a use-case very similar to this, this Projects purpose has
  - [x] Let the user scan the adress of the remote from a QR-Code
  - [ ] Support APIs
  - [ ] Support logging of scanned strings for later use in other programms (csv, json, etc.)
+ - [ ] Check for scheme updates even when not in settings and alert
 
 ## Needs Fixing:
  - [x] Nearly everything related to Settings
