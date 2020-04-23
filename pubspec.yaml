@@ -17,6 +17,7 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
+  url_launcher:
   path_provider: ^1.6.7
   shared_preferences: ^0.5.6
   http: ^0.12.0

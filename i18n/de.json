@@ -21,5 +21,8 @@
     "toggleLittleWidget": "QR-Scanner immer angeschaltet",
     "toggleLittleWidgetDescription": "Zeigt einen kleinen QR-Scanner in der unteren rechten Ecke",
     "schemeSettings": "Schema ändern:",
-    "appearanceSettings": "Aussehen ändern:"
+    "appearanceSettings": "Aussehen ändern:",
+    "aboutHeader": "Über:",
+    "about": "Impressum und Datenschutz-Erklärung finden Sie unter:",
+    "licence": "Diese App wurde mit Flutter entwickelt und unter ist unter der MIT Public Licence lizenziert."
 }

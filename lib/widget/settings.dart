@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:bacnet_translator/localization.dart';
 import 'package:bacnet_translator/storage.dart';
@@ -257,8 +258,18 @@ class _SettingsWidget extends State<SettingsWidget> {
     _getPrefs();
   }
 
+  _launchURL() async {
+    const url = 'https://noell.li';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   @override
   Widget build (BuildContext context) {
+
   return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -290,17 +301,49 @@ class _SettingsWidget extends State<SettingsWidget> {
               ),
             ),
             SwitchListTile(
-                  title: Text(AppLocalizations.of(context).translate('toggleLittleWidget')),
-                  subtitle: Text(AppLocalizations.of(context).translate('toggleLittleWidgetDescription')),
-                  value: _littleWidget,
-                  onChanged: (bool value) {
-                    _toggleLittleWidget(value);
-                    setState(() {
-                      _littleWidget = value;
-                    });
-                  },
+              title: Text(AppLocalizations.of(context).translate('toggleLittleWidget')),
+              subtitle: Text(AppLocalizations.of(context).translate('toggleLittleWidgetDescription')),
+              value: _littleWidget,
+              onChanged: (bool value) {
+                _toggleLittleWidget(value);
+                setState(() {
+                  _littleWidget = value;
+                });
+              },
+            ),
+            Divider(),
+            ListTile(
+              title: Text(
+                AppLocalizations.of(context).translate('aboutHeader'),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
-              ]
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(15),
+              child: Text(
+                AppLocalizations.of(context).translate('licence'),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              child: Column(
+                children: <Widget>[
+                  Text(
+                    AppLocalizations.of(context).translate('about'),
+                    textAlign: TextAlign.center,
+                  ),
+                  RaisedButton(
+                    child: Text("noell.li"),
+                    onPressed: () => _launchURL(),
+                  )
+                ],
+              ),
+            ),
+          ]
         )
       ),
     );

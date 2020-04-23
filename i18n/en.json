@@ -21,5 +21,8 @@
     "toggleLittleWidget": "QR-Scanner is always on",
     "toggleLittleWidgetDescription": "View a little QR-Scanner in the bottom right corner, scanning non-stop",
     "schemeSettings": "Schema Settings:",
-    "appearanceSettings": "Appearance Settings:"
+    "appearanceSettings": "Appearance Settings:",
+    "aboutHeader": "About:",
+    "about": "More info under:",
+    "licence": "This app was developed with Flutter and is published under the MIT Piblic Licence",
 }
