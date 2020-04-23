@@ -123,11 +123,11 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
   }
-// ############################################################
-// ToDo: Append Strings to File function
-// ToDo: Switch in Header Bar to enable savong of Adresses
-// ToDo: functions to trigger saving of adresses in Parser  
-// ############################################################
+/// ############################################################
+/// ToDo: Append Strings to File function
+/// ToDo: Switch in Header Bar to enable saving of Adresses
+/// ToDo: functions to trigger saving of adresses in Parser  
+/// ############################################################
 
   void _appendStringToFile(String _stringToParse, bool isScheme) {
     String _originalJson;
@@ -187,12 +187,12 @@ class _MyHomePageState extends State<MyHomePage> {
     Widget _centerWidget;
     Widget _body;
     Widget _fab;
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    /// This method is rerun every time setState is called, for instance as done
+    /// by the _incrementCounter method above.
+    ///
+    /// The Flutter framework has been optimized to make rerunning build methods
+    /// fast, so that you can just rebuild anything that needs updating rather
+    /// than having to individually change instances of widgets.
     widget.title = AppLocalizations.of(context).translate('title');
 
     if (_codeAvailable) {
@@ -211,7 +211,19 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
 
-    if (_littleWidget) {
+
+    _body = _centerWidget;
+    _fab = Container();
+    if( _settingsButton ){
+      _fab = FloatingActionButton(
+        onPressed: () {
+          _navigateSettings();
+        },
+        tooltip: AppLocalizations.of(context).translate("settings"),
+        child: Icon(Icons.settings),
+        heroTag: 1,
+      );
+    } else if ( _littleWidget ) {
       _body =  new Stack(
         children: <Widget>[
           _centerWidget,
@@ -221,17 +233,8 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         ]
       );
-      _fab = Container();
     } else {
-      _body = _centerWidget;
-      _fab = _settingsButton ? FloatingActionButton(
-        onPressed: () {
-          _navigateSettings();
-        },
-        tooltip: AppLocalizations.of(context).translate("settings"),
-        child: Icon(Icons.settings),
-        heroTag: 1,
-      ) : FloatingActionButton(
+      _fab = FloatingActionButton(
         onPressed: () => _showOverlay(context),
         tooltip: AppLocalizations.of(context).translate("scanCode"),
         child: Icon(Icons.search),
