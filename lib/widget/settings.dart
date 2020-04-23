@@ -149,7 +149,9 @@ class _FormWidget extends State<FormWidget> {
 
   @override
   Widget build(BuildContext context) {
+    var _width = MediaQuery.of(context).size.width;
     var _button;
+    
     if ( _newVersionAvailable ) {
       _button = RaisedButton(
         color: _dataColor,
@@ -195,8 +197,10 @@ class _FormWidget extends State<FormWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Container(
+                width: _width / 2,
                 padding: EdgeInsets.all(15),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
                       _error,
@@ -208,6 +212,7 @@ class _FormWidget extends State<FormWidget> {
                 ),
               ),
               Container(
+                width: _width /2,
                 padding: EdgeInsets.all(15),
                 child: _button,
               ),
