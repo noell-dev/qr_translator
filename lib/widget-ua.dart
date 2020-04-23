@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 
-
+// ToDo: Change name and describe!
 class UaWidget extends StatefulWidget {
   final String adress;
   final String jsonString;
@@ -20,7 +20,7 @@ class UaWidget extends StatefulWidget {
   _UaWidget createState() => _UaWidget();
 }
 
-
+// ToDo: Change name and describe!
 class _UaWidget extends State<UaWidget> {
   @override
   Widget build(BuildContext context) {
