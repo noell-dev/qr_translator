@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:bacnet_translator/widget/list-code-translation.dart';
 import 'package:bacnet_translator/widget/qr-scanner.dart';
 import 'package:bacnet_translator/widget/settings.dart';
+import 'package:bacnet_translator/storage.dart';
 import 'package:bacnet_translator/localization.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
