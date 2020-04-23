@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:bacnet_translator/localization.dart';
 import 'package:bacnet_translator/storage.dart';
+import 'package:bacnet_translator/widget/qr-scanner.dart';
 
 class FormWidget extends StatefulWidget {
   @override
@@ -89,6 +90,7 @@ class _FormWidget extends State<FormWidget> {
     }
   }
 
+  /// get the Preferences
   Future _getPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -107,15 +109,48 @@ class _FormWidget extends State<FormWidget> {
 
 @override
   void initState() {
+    super.initState();
     _getPrefs();
     _fetchScheme(http.Client(), _adress);
-    super.initState();
   }
+
+  void _showOverlay(BuildContext context) async {
+      final adress = await Navigator.push(
+        context,
+        // Create the QROverlay in the next step.
+        PageRouteBuilder(
+          opaque: false,
+          pageBuilder: (context, animation, secondaryAnimation) {
+            return Material(
+              color: Colors.white,
+              
+              type: MaterialType.transparency,
+              // make sure that the overlay content is not cut off
+              child: SafeArea(
+                child: buildOverlayContent(context),
+              ),
+            );
+          },
+      ));
+      callback(adress);
+  }
+
+
+  void callback(String adress) {
+    if (adress != null) {
+      setState(() {
+        this._adress = adress;
+        this._controller.text = adress;
+      });
+      _fetchScheme(http.Client(), this._adress);
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
     var _button;
-    if(_newVersionAvailable){
+    if ( _newVersionAvailable ) {
       _button = RaisedButton(
         color: _dataColor,
         onPressed: () {
@@ -140,16 +175,44 @@ class _FormWidget extends State<FormWidget> {
       key: _formKey,
       child: Column(
         children: <Widget>[
-          TextField(
-            controller: _controller,
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 15),
+            child: TextField(
+              decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.camera_alt),
+                  onPressed: () {
+                    _showOverlay(context);
+                  },
+                ),
+                border: OutlineInputBorder(),
+                labelText: AppLocalizations.of(context).translate('descriptionToAdress'),
+              ),
+              controller: _controller,
+            ),
           ),
-          Text(
-            _error,
-            style: TextStyle(color: _dataColor)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.all(15),
+                child: Column(
+                  children: <Widget>[
+                    Text(
+                      _error,
+                      style: TextStyle(color: _dataColor)
+                    ),
+                    Text("${AppLocalizations.of(context).translate('localVersion')}: ${this._localVersion ?? "---"}"),
+                    this._adressCorrect ? Text("${AppLocalizations.of(context).translate('onlineVersion')}: ${this._decodedJson['Version']}") : Text("${AppLocalizations.of(context).translate('onlineVersion')}: ---"),
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(15),
+                child: _button,
+              ),
+            ],
           ),
-          Text("${AppLocalizations.of(context).translate('localVersion')}: ${this._localVersion}"),
-          this._adressCorrect ? Text("${AppLocalizations.of(context).translate('onlineVersion')}: ${this._decodedJson['Version']}") : Text("${AppLocalizations.of(context).translate('onlineVersion')}: ---"),
-          _button,
         ],
       ),
     );
@@ -158,7 +221,8 @@ class _FormWidget extends State<FormWidget> {
 
 
 
-// ###################### Main Settings Widget ##########################################
+/// ###################### Main Settings Widget ##########################################
+/// ToDo: integrate FormWidget into the normal Settings to minmize double-code and async operations
 class SettingsWidget extends StatefulWidget {
 
   
@@ -184,8 +248,8 @@ class _SettingsWidget extends State<SettingsWidget> {
 
 @override
   void initState() {
-    _getPrefs();
     super.initState();
+    _getPrefs();
   }
 
   @override
@@ -197,16 +261,32 @@ class _SettingsWidget extends State<SettingsWidget> {
         title: Text(AppLocalizations.of(context).translate('settings')),
       ),
       body: Center(
-        child: Column(
+        child: ListView(
           children: <Widget>[
-            Row(
-              children: <Widget>[
-                Text(AppLocalizations.of(context).translate('enterAdress'))
-              ],
+            ListTile(
+              title: Text(
+                AppLocalizations.of(context).translate('schemeSettings'),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Text(AppLocalizations.of(context).translate('enterAdress')),
             ),
             FormWidget(),
+            Divider(),
+            ListTile(
+              title: Text(
+                AppLocalizations.of(context).translate('appearanceSettings'),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
             SwitchListTile(
                   title: Text(AppLocalizations.of(context).translate('toggleLittleWidget')),
+                  subtitle: Text(AppLocalizations.of(context).translate('toggleLittleWidgetDescription')),
                   value: _littleWidget,
                   onChanged: (bool value) {
                     _toggleLittleWidget(value);

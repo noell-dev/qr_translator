@@ -13,6 +13,35 @@ const cam_paused = "CAM PAUSED";
 const cam_paused_i = Icon(Icons.play_arrow, color: Colors.white,);
 
 
+Widget buildOverlayContent(BuildContext context) {
+  var screenSize = MediaQuery.of(context).size;
+  var width = screenSize.width;
+  var height = screenSize.height;
+
+  return Container(
+    decoration: BoxDecoration(
+      color: Color.fromRGBO(255, 255, 255, 0.7),
+    ),
+    padding: EdgeInsets.all(8),
+    child: Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Container(
+            width: width,
+            height: width, // height - 200,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30),
+              child: QrWidget(),
+            )
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+
 class LittleQrWidget extends StatefulWidget {
   Function callback;
 
@@ -51,12 +80,11 @@ class QrWidget extends StatefulWidget {
 
 class _QrWidget extends State<QrWidget> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  var qrText = "";
 
   void callback(String code) {
-    setState(() {
-      qrText = code;
-    });
+    if (code != null) {
+      Navigator.pop(context, code);
+    }
   }
 
   QRViewController controller;
@@ -71,68 +99,6 @@ class _QrWidget extends State<QrWidget> {
       Expanded(
         flex: 5,
         child:  CameraView(callback)
-      ),
-      Expanded(
-        flex: 1,
-        child: FittedBox(
-          fit: BoxFit.contain,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.all(8.0),
-                    child: Text(
-                      "Code:",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.all(8.0),
-                    child: Text(
-                      "$qrText",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  )
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-      Expanded(
-        flex: 1,
-        child: FittedBox(
-          fit: BoxFit.contain,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.all(8.0),
-                    child: RaisedButton(
-                      onPressed: () => Navigator.pop(context, qrText),
-                      child: Icon(Icons.check),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.all(8.0),
-                    child: RaisedButton(
-                      onPressed: () => Navigator.pop(context, null),
-                      child: Icon(Icons.close),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
       ),
     ],
     );
@@ -227,7 +193,7 @@ class _CameraView extends State<CameraView> {
                   },
                 )
               ],
-            ) 
+            )
           )
         )
       ]

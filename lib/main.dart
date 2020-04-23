@@ -9,44 +9,6 @@ import 'package:bacnet_translator/localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-
-class QROverlay extends StatelessWidget {
-
-  @override
-  Widget build(
-      BuildContext context,
-      
-      ) {
-    // This makes sure that text and other content follows the material style
-    return Material(
-      type: MaterialType.transparency,
-      // make sure that the overlay content is not cut off
-      child: SafeArea(
-        child: _buildOverlayContent(context),
-      ),
-    );
-  }
-
-  Widget _buildOverlayContent(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
-    var width = screenSize.width;
-    var height = screenSize.height;
-
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            width: width,
-            height: height - 200,
-            child: QrWidget(),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -100,8 +62,20 @@ class _MyHomePageState extends State<MyHomePage> {
       final code = await Navigator.push(
         context,
         // Create the QROverlay in the next step.
-        MaterialPageRoute(builder: (context) => QROverlay())
-      );
+        PageRouteBuilder(
+          opaque: false,
+          pageBuilder: (context, animation, secondaryAnimation) {
+            return Material(
+              color: Colors.white,
+              
+              type: MaterialType.transparency,
+              // make sure that the overlay content is not cut off
+              child: SafeArea(
+                child: buildOverlayContent(context),
+              ),
+            );
+          },
+      ));
       callback(code);
   }
 
@@ -123,6 +97,8 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
   }
+
+
 /// ############################################################
 /// ToDo: Append Strings to File function
 /// ToDo: Switch in Header Bar to enable saving of Adresses
@@ -163,17 +139,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void callback(String code) {
-      if (code != null) {
-        setState(() {
-          _codeAvailable = true;
-          _code = code;
-        });
-      } else {
-        setState(() {
-          _codeAvailable = false;
-          _result = "noCode";
-        });
-      }
+    if (code != null) {
+      setState(() {
+        _codeAvailable = true;
+        _code = code;
+      });
+    } else {
+      setState(() {
+        _codeAvailable = false;
+        _result = "noCode";
+      });
+    }
   }
 
   void _navigateSettings() async {
@@ -195,6 +171,7 @@ class _MyHomePageState extends State<MyHomePage> {
     /// than having to individually change instances of widgets.
     widget.title = AppLocalizations.of(context).translate('title');
 
+
     if (_codeAvailable) {
       _centerWidget = ListCodeTranslationWidget(
           adress: _code,
@@ -205,7 +182,10 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(AppLocalizations.of(context).translate(_result)),
+            ListTile(
+              title: Text(AppLocalizations.of(context).translate(_result)),
+              subtitle: Text(AppLocalizations.of(context).translate(_result + "Description")),
+            )
           ],
         ),
       );
@@ -229,7 +209,10 @@ class _MyHomePageState extends State<MyHomePage> {
           _centerWidget,
           new Align(
             alignment: Alignment.bottomRight,
-            child: LittleQrWidget(callback)
+            child: ClipRRect(
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(15)),
+              child: LittleQrWidget(callback),
+            )
           )
         ]
       );
