@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 
 import 'package:bacnet_translator/widget/list-code-translation.dart';
 import 'package:bacnet_translator/widget/qr-scanner.dart';
@@ -53,10 +54,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool _littleWidget = false;
   bool _settingsButton = true;
-  String _jsonString = "file_error";
   String _result = "noFile";
   String _code;
   bool _codeAvailable = false;
+  Map<String, dynamic> _json;
 
   void _showOverlay(BuildContext context) async {
       final code = await Navigator.push(
@@ -85,13 +86,12 @@ class _MyHomePageState extends State<MyHomePage> {
       if (json == "file_error") {
         setState(() {
           _settingsButton = true;
-          _jsonString = json;
           _result = "noFile";
         });
       } else {
         setState(() {
           _settingsButton = false;
-          _jsonString = json;
+          _json = jsonDecode(json);
           _result = "noCode";
         });
       }
@@ -107,8 +107,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _appendStringToFile(String _stringToParse, bool isScheme) {
     String _originalJson;
-
-
     widget.storage.readJsonStore(false).then((String json) {
       if (json == "file_error"){
 
@@ -116,8 +114,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
       }
     });
-
-
     JsonStorage().writeJsonStore(_stringToParse, true);
   }
 
@@ -163,20 +159,23 @@ class _MyHomePageState extends State<MyHomePage> {
     Widget _centerWidget;
     Widget _body;
     Widget _fab;
-    /// This method is rerun every time setState is called, for instance as done
-    /// by the _incrementCounter method above.
-    ///
-    /// The Flutter framework has been optimized to make rerunning build methods
-    /// fast, so that you can just rebuild anything that needs updating rather
-    /// than having to individually change instances of widgets.
+    
     widget.title = AppLocalizations.of(context).translate('title');
 
 
     if (_codeAvailable) {
-      _centerWidget = ListCodeTranslationWidget(
-          adress: _code,
-          jsonString: _jsonString
+      if (_json.containsKey("order")) {
+        _centerWidget = ExtendetCodeTranslationWidget(
+          code: _code,
+          scheme: _json,
         );
+      } else {
+        _centerWidget = SimpleCodeTranslationWidget(
+          adress: _code,
+          scheme: _json,
+        );
+      }
+
     } else {
       _centerWidget = Center(
           child: Column(
