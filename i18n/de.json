@@ -24,5 +24,7 @@
     "appearanceSettings": "Aussehen ändern:",
     "aboutHeader": "Über:",
     "about": "Impressum und Datenschutz-Erklärung finden Sie unter:",
-    "licence": "Diese App wurde mit Flutter entwickelt und unter ist unter der MIT Public Licence lizenziert."
+    "licence": "Diese App wurde mit Flutter entwickelt und unter ist unter der MIT Public Licence lizenziert.",
+    "notInt": "Ist keine Zahl.",
+    "wrongLenght": "Code hat die falsche Länge."
 }

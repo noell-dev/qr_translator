@@ -9,7 +9,7 @@
     "scanCode": "Scan Code",
     "testing": "Testing ...",
     "good": "Everything Fine!",
-    "newVersion": "Update",
+    "newVersion": "Update available",
     "activateVersion": "updaten",
     "formatError": "Target-File not well formatted!",
     "adressError": "Adress is incorrect!",
@@ -24,5 +24,7 @@
     "appearanceSettings": "Appearance Settings:",
     "aboutHeader": "About:",
     "about": "More info under:",
-    "licence": "This app was developed with Flutter and is published under the MIT Piblic Licence"
+    "licence": "This app was developed with Flutter and is published under the MIT Public Licence",
+    "notInt": "Is not a Number.",
+    "wrongLenght": "Code has a wrong Lenght."
 }
