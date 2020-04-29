@@ -12,12 +12,10 @@ import 'package:bacnet_translator/widget/qr-scanner.dart';
 
 class FormWidget extends StatefulWidget {
   @override
-  _FormWidget createState(){
-    return _FormWidget();
-  }
+  _FormWidgetState createState() => _FormWidgetState();
 }
 
-class _FormWidget extends State<FormWidget> {
+class _FormWidgetState extends State<FormWidget> {
   final _formKey = GlobalKey<FormState>();
   String _adress;
   String _error = "Testing ...";
@@ -60,6 +58,9 @@ class _FormWidget extends State<FormWidget> {
       final _response = await http.get(adress);
       try {
         var _decoded = json.decode(_response.body) as Map<String, dynamic>;
+        if (_decoded['Version'] == null) {
+          throw FormatException();
+        }
         var _compare =  await _compareVersion(_decoded['Version']);
         await prefs.setString('adress', adress);
         setState(() {
