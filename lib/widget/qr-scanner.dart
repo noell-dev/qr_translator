@@ -18,26 +18,30 @@ Widget buildOverlayContent(BuildContext context) {
   var width = screenSize.width;
   var height = screenSize.height;
 
-  return Container(
-    decoration: BoxDecoration(
-      color: Color.fromRGBO(255, 255, 255, 0.7),
-    ),
-    padding: EdgeInsets.all(8),
-    child: Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            width: width,
-            height: width, // height - 200,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(30),
-              child: QrWidget(),
-            )
+  return OrientationBuilder(
+    builder: (context, orientation) {
+      return Container(
+        decoration: BoxDecoration(
+          color: Color.fromRGBO(255, 255, 255, 0.7),
+        ),
+        padding: EdgeInsets.all(8),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                width: orientation == Orientation.landscape ? height : width,
+                height: orientation == Orientation.landscape ? height : width,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(30),
+                  child: QrWidget(),
+                )
+              ),
+            ],
           ),
-        ],
-      ),
-    ),
+        ),
+      );
+    },
   );
 }
 
@@ -63,11 +67,14 @@ class _LittleQrWidget extends State<LittleQrWidget> {
     var screenSize = MediaQuery.of(context).size;
     var width = screenSize.width;
     var height = screenSize.height;
-    return Container(
-            width: width/2,
-            height: height/4,
+    return OrientationBuilder(
+    builder: (context, orientation) {
+      return Container(
+            width: orientation == Orientation.landscape ? width/2 : height/2,
+            height: orientation == Orientation.landscape ? width/2 : height/2,
             child: CameraView(callback)
           );
+    });
   }
 }
 
@@ -82,9 +89,7 @@ class _QrWidget extends State<QrWidget> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
   void callback(String code) {
-    if (code != null) {
-      Navigator.pop(context, code);
-    }
+      Navigator.of(context).pop(code);
   }
 
   QRViewController controller;
@@ -120,6 +125,7 @@ class CameraView extends StatefulWidget {
 
 
 class _CameraView extends State<CameraView> {
+  var qr_text = null;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   var flashState = flash_on;
   var flashImage = flash_on_i;
@@ -203,7 +209,12 @@ class _CameraView extends State<CameraView> {
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
-      this.widget.callback(scanData);
+      if (scanData != null) {
+        if (qr_text != scanData){  
+          this.widget.callback(scanData);
+          this.qr_text = scanData;
+        }
+      }
     });
   }
 
