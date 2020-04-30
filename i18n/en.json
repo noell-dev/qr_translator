@@ -20,11 +20,18 @@
     "onlineVersion": "Online Version",
     "toggleLittleWidget": "QR-Scanner is always on",
     "toggleLittleWidgetDescription": "View a little QR-Scanner in the bottom right corner, scanning non-stop",
+    "toggleHelp": "Show Header",
+    "toggleHelpDescription": "Shows a Header-Tile explaining which text means what.",
+    "toggleColorActivated": "Activate Colors",
+    "toggleColorActivatedDescription": "Shows Colors of found Codes also in the corresponding description.",
     "schemeSettings": "Schema Settings:",
     "appearanceSettings": "Appearance Settings:",
     "aboutHeader": "About:",
     "about": "More info under:",
     "licence": "This app was developed with Flutter and is published under the MIT Public Licence",
     "notInt": "Is not a Number.",
-    "wrongLenght": "Code has a wrong Lenght."
+    "clearText": "Clear Text",
+    "description": "Description",
+    "code": "Code",
+    "wronglength": "Code has a wrong length."
 }
