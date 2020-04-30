@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bacnet_translator/localization.dart';
+import 'package:qr_translator/localization.dart';
 
 /// The Widget to slice and display the codes scanned and passed through the QR-Scanner
 /// It expects to strings, adress and jsonString:
@@ -78,20 +78,23 @@ class Entry {
   });
 }
 
-
-
-
 class ExtendetCodeTranslationWidget extends StatelessWidget {
 
   final String code;
   final Map<String, dynamic> scheme;
+  final bool showHelp;
+  final bool colorActivated;
   
   final entries = {};
+
+  
 
   ExtendetCodeTranslationWidget({
     Key key,
       @required this.code,
       @required this.scheme,
+      @required this.showHelp,
+      @required this.colorActivated,
     }) : super(key: key);
 
   bool _validateCode (codePart, schemePart, dependList) {
@@ -137,7 +140,7 @@ class ExtendetCodeTranslationWidget extends StatelessWidget {
     if (!scheme["possible_lengths"].contains(code.length)){
       return ListTile(
           title: Text(
-            "Wrong Lenght",
+            AppLocalizations.of(context).translate('wronglength'),
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.red),
@@ -206,9 +209,10 @@ class ExtendetCodeTranslationWidget extends StatelessWidget {
 
       pos += 1;
     }
-    
+      
 
-    return ListView.builder(
+    return ListView.separated(
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: entries.length,
       itemBuilder: (context, index) {
         List posEntries = entries[index];
@@ -219,7 +223,7 @@ class ExtendetCodeTranslationWidget extends StatelessWidget {
         for (Entry entry in posEntries){
           if (descriptions.length >= 1){
             descriptions.add(TextSpan(
-              text: " & ",
+              text: "\n",
               style: TextStyle(
                 color: Colors.black,
                 //fontWeight: FontWeight.bold,
@@ -229,7 +233,7 @@ class ExtendetCodeTranslationWidget extends StatelessWidget {
           descriptions.add(TextSpan(
             text: entry.description,
             style: TextStyle(
-              color: entry.color,
+              color: colorActivated ? entry.color : Colors.black,
               //fontWeight: FontWeight.bold,
             )
           ));
@@ -248,11 +252,62 @@ class ExtendetCodeTranslationWidget extends StatelessWidget {
             )
           ));
         }
-        return ListTile(
+        Widget tile = ListTile(
           title: RichText(text: TextSpan(children: clearTexts),),
           subtitle: RichText(text: TextSpan(children: descriptions),),
-          leading: RichText(text: TextSpan(children: codeParts),),
+          leading: Container(
+            alignment: Alignment.centerLeft,
+            width: 80,
+            child: RichText(text: TextSpan(children: codeParts),)
+          ),
         );
+        if (index == 0 && showHelp){
+          return Column(
+            children: <Widget>[
+              ListTile(
+                title: RichText(
+                  text: TextSpan(
+                    text: AppLocalizations.of(context).translate('clearText'),
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold
+                    )
+                  ),
+                ),
+                subtitle: RichText(
+                  text: TextSpan(
+                    text: AppLocalizations.of(context).translate('description'),
+                    style: TextStyle(
+                      color: Colors.black,
+                    )
+                  ),
+                ),
+                leading: Container(
+                  alignment: Alignment.centerLeft,
+                  width: 80,
+                  child: RichText(
+                    text: TextSpan(
+                      text: AppLocalizations.of(context).translate('code'),
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold
+                      )
+                    ),
+                  ),
+                ),
+                trailing: Icon(Icons.help)
+              ),
+              Divider(),
+              tile,
+            ]
+          );
+        } else {
+          return tile;
+        }
+
+      },
+      separatorBuilder: (context, index){
+        return Divider();
       },
     );
   }

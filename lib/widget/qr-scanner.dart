@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:flutter/scheduler.dart';
 
 
 const flash_on = "FLASH ON";
@@ -16,7 +17,7 @@ const cam_paused_i = Icon(Icons.play_arrow, color: Colors.white,);
 Widget buildOverlayContent(BuildContext context) {
   var screenSize = MediaQuery.of(context).size;
   var width = screenSize.width;
-  var height = screenSize.height;
+  var height = screenSize.height - 40;
 
   return OrientationBuilder(
     builder: (context, orientation) {
@@ -70,8 +71,8 @@ class _LittleQrWidget extends State<LittleQrWidget> {
     return OrientationBuilder(
     builder: (context, orientation) {
       return Container(
-            width: orientation == Orientation.landscape ? width/2 : height/2,
-            height: orientation == Orientation.landscape ? width/2 : height/2,
+            width: orientation == Orientation.portrait ? width/2 : height/2,
+            height: orientation == Orientation.portrait ? width/2 : height/2,
             child: CameraView(callback)
           );
     });
@@ -89,7 +90,10 @@ class _QrWidget extends State<QrWidget> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
   void callback(String code) {
+    Future.delayed(Duration.zero, () {
       Navigator.of(context).pop(code);
+    });
+      
   }
 
   QRViewController controller;
@@ -210,7 +214,7 @@ class _CameraView extends State<CameraView> {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
       if (scanData != null) {
-        if (qr_text != scanData){  
+        if (qr_text != scanData){
           this.widget.callback(scanData);
           this.qr_text = scanData;
         }

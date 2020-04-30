@@ -6,9 +6,9 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:bacnet_translator/localization.dart';
-import 'package:bacnet_translator/storage.dart';
-import 'package:bacnet_translator/widget/qr-scanner.dart';
+import 'package:qr_translator/localization.dart';
+import 'package:qr_translator/storage.dart';
+import 'package:qr_translator/widget/qr-scanner.dart';
 
 class FormWidget extends StatefulWidget {
   @override
@@ -26,6 +26,10 @@ class _FormWidgetState extends State<FormWidget> {
   bool _adressCorrect = false;
   Color _dataColor = Colors.grey;
   final _controller = TextEditingController();
+
+  void _resetOnChange() {
+    _fetchScheme(http.Client(), _controller.text);
+  }
 
   // Compare the Version Numbers
   Future _compareVersion(version) async {
@@ -114,6 +118,7 @@ class _FormWidgetState extends State<FormWidget> {
     super.initState();
     _getPrefs();
     _fetchScheme(http.Client(), _adress);
+    _controller.addListener(_resetOnChange);
   }
 
   void _showOverlay(BuildContext context) async {
@@ -238,17 +243,29 @@ class SettingsWidget extends StatefulWidget {
 
 class _SettingsWidget extends State<SettingsWidget> {
   bool _littleWidget = false;
+  bool _colorActivated = false;
+  bool _showHelp = true;
 
-  Future _toggleLittleWidget(value) async {
+  Future _toggleValue(name, value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool("littleWidget", value);
+    prefs.setBool(name, value);
   }
 
   Future _getPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey("littleWidget")) {
+    if (prefs.containsKey("littleWidget")){
       setState(() {
         _littleWidget = prefs.getBool("littleWidget");
+      });
+    }
+    if (prefs.containsKey("colorActivated")){
+      setState(() {
+        _colorActivated = prefs.getBool("colorActivated");
+      });
+    }
+    if(prefs.containsKey("showHelp")) {
+      setState(() {
+        _showHelp = prefs.getBool("showHelp");
       });
     }
   }
@@ -301,14 +318,39 @@ class _SettingsWidget extends State<SettingsWidget> {
                 ),
               ),
             ),
+            // Toggle littleWidget
             SwitchListTile(
               title: Text(AppLocalizations.of(context).translate('toggleLittleWidget')),
               subtitle: Text(AppLocalizations.of(context).translate('toggleLittleWidgetDescription')),
               value: _littleWidget,
               onChanged: (bool value) {
-                _toggleLittleWidget(value);
+                _toggleValue("littleWidget", value);
                 setState(() {
                   _littleWidget = value;
+                });
+              },
+            ),
+            // Toggle Help
+            SwitchListTile(
+              title: Text(AppLocalizations.of(context).translate('toggleHelp')),
+              subtitle: Text(AppLocalizations.of(context).translate('toggleHelpDescription')),
+              value: _showHelp,
+              onChanged: (bool value) {
+                _toggleValue("showHelp", value);
+                setState(() {
+                  _showHelp = value;
+                });
+              },
+            ),
+            // Toggle colorful
+            SwitchListTile(
+              title: Text(AppLocalizations.of(context).translate('toggleColorActivated')),
+              subtitle: Text(AppLocalizations.of(context).translate('toggleColorActivatedDescription')),
+              value: _colorActivated,
+              onChanged: (bool value) {
+                _toggleValue("colorActivated", value);
+                setState(() {
+                  _colorActivated = value;
                 });
               },
             ),

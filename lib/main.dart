@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
-import 'package:bacnet_translator/widget/list-code-translation.dart';
-import 'package:bacnet_translator/widget/qr-scanner.dart';
-import 'package:bacnet_translator/widget/settings.dart';
-import 'package:bacnet_translator/storage.dart';
-import 'package:bacnet_translator/localization.dart';
+import 'package:qr_translator/widget/list-code-translation.dart';
+import 'package:qr_translator/widget/qr-scanner.dart';
+import 'package:qr_translator/widget/settings.dart';
+import 'package:qr_translator/storage.dart';
+import 'package:qr_translator/localization.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -53,6 +53,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool _littleWidget = false;
+  bool _showHelp = true;
+  bool _colorActivated = false;
   bool _settingsButton = true;
   String _result = "noFile";
   String _code;
@@ -119,9 +121,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future _getPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey("littleWidget")) {
+    if (prefs.containsKey("littleWidget")){
       setState(() {
         _littleWidget = prefs.getBool("littleWidget");
+      });
+    }
+    if (prefs.containsKey("colorActivated")){
+      setState(() {
+        _colorActivated = prefs.getBool("colorActivated");
+      });
+    }
+    if(prefs.containsKey("showHelp")) {
+      setState(() {
+        _showHelp = prefs.getBool("showHelp");
       });
     }
   }
@@ -168,6 +180,8 @@ class _MyHomePageState extends State<MyHomePage> {
         _centerWidget = ExtendetCodeTranslationWidget(
           code: _code,
           scheme: _json,
+          showHelp: _showHelp,
+          colorActivated: _colorActivated,
         );
       } else {
         _centerWidget = SimpleCodeTranslationWidget(
