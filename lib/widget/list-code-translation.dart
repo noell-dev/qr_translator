@@ -212,7 +212,7 @@ class ExtendetCodeTranslationWidget extends StatelessWidget {
       
 
     return ListView.separated(
-      physics: const NeverScrollableScrollPhysics(),
+      // physics: const NeverScrollableScrollPhysics(),
       itemCount: entries.length,
       itemBuilder: (context, index) {
         List posEntries = entries[index];
