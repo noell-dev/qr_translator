@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:flutter/scheduler.dart';
 
 
 const flash_on = "FLASH ON";
@@ -11,6 +12,39 @@ const cam_on = "CAM ON";
 const cam_on_i = Icon(Icons.pause, color: Colors.white,);
 const cam_paused = "CAM PAUSED";
 const cam_paused_i = Icon(Icons.play_arrow, color: Colors.white,);
+
+
+Widget buildOverlayContent(BuildContext context) {
+  var screenSize = MediaQuery.of(context).size;
+  var width = screenSize.width;
+  var height = screenSize.height - 40;
+
+  return OrientationBuilder(
+    builder: (context, orientation) {
+      return Container(
+        decoration: BoxDecoration(
+          color: Color.fromRGBO(255, 255, 255, 0.7),
+        ),
+        padding: EdgeInsets.all(8),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                width: orientation == Orientation.landscape ? height : width,
+                height: orientation == Orientation.landscape ? height : width,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(30),
+                  child: QrWidget(),
+                )
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
 
 
 class LittleQrWidget extends StatefulWidget {
@@ -34,11 +68,14 @@ class _LittleQrWidget extends State<LittleQrWidget> {
     var screenSize = MediaQuery.of(context).size;
     var width = screenSize.width;
     var height = screenSize.height;
-    return Container(
-            width: width/2,
-            height: height/4,
+    return OrientationBuilder(
+    builder: (context, orientation) {
+      return Container(
+            width: orientation == Orientation.portrait ? width/2 : height/2,
+            height: orientation == Orientation.portrait ? width/2 : height/2,
             child: CameraView(callback)
           );
+    });
   }
 }
 
@@ -51,12 +88,12 @@ class QrWidget extends StatefulWidget {
 
 class _QrWidget extends State<QrWidget> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  var qrText = "";
 
   void callback(String code) {
-    setState(() {
-      qrText = code;
+    Future.delayed(Duration.zero, () {
+      Navigator.of(context).pop(code);
     });
+      
   }
 
   QRViewController controller;
@@ -71,68 +108,6 @@ class _QrWidget extends State<QrWidget> {
       Expanded(
         flex: 5,
         child:  CameraView(callback)
-      ),
-      Expanded(
-        flex: 1,
-        child: FittedBox(
-          fit: BoxFit.contain,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.all(8.0),
-                    child: Text(
-                      "Code:",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.all(8.0),
-                    child: Text(
-                      "$qrText",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  )
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-      Expanded(
-        flex: 1,
-        child: FittedBox(
-          fit: BoxFit.contain,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.all(8.0),
-                    child: RaisedButton(
-                      onPressed: () => Navigator.pop(context, qrText),
-                      child: Icon(Icons.check),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.all(8.0),
-                    child: RaisedButton(
-                      onPressed: () => Navigator.pop(context, null),
-                      child: Icon(Icons.close),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
       ),
     ],
     );
@@ -154,6 +129,7 @@ class CameraView extends StatefulWidget {
 
 
 class _CameraView extends State<CameraView> {
+  var qr_text = null;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   var flashState = flash_on;
   var flashImage = flash_on_i;
@@ -227,7 +203,7 @@ class _CameraView extends State<CameraView> {
                   },
                 )
               ],
-            ) 
+            )
           )
         )
       ]
@@ -237,7 +213,12 @@ class _CameraView extends State<CameraView> {
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
-      this.widget.callback(scanData);
+      if (scanData != null) {
+        if (qr_text != scanData){
+          this.widget.callback(scanData);
+          this.qr_text = scanData;
+        }
+      }
     });
   }
 

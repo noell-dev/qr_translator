@@ -1,4 +1,4 @@
-package com.example.bacnet_translator
+package li.noell.qr_translator
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

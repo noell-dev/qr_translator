@@ -1,50 +1,14 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 
-import 'package:bacnet_translator/widget-ua.dart';
-import 'package:bacnet_translator/widget-qr.dart';
-import 'package:bacnet_translator/widget-settings.dart';
-import 'package:bacnet_translator/localization.dart';
+import 'package:qr_translator/widget/list-code-translation.dart';
+import 'package:qr_translator/widget/qr-scanner.dart';
+import 'package:qr_translator/widget/settings.dart';
+import 'package:qr_translator/storage.dart';
+import 'package:qr_translator/localization.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
-
-class QROverlay extends StatelessWidget {
-
-  @override
-  Widget build(
-      BuildContext context,
-      
-      ) {
-    // This makes sure that text and other content follows the material style
-    return Material(
-      type: MaterialType.transparency,
-      // make sure that the overlay content is not cut off
-      child: SafeArea(
-        child: _buildOverlayContent(context),
-      ),
-    );
-  }
-
-  Widget _buildOverlayContent(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
-    var width = screenSize.width;
-    var height = screenSize.height;
-
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            width: width,
-            height: height - 200,
-            child: QrWidget(),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 void main() => runApp(MyApp());
 
@@ -89,18 +53,32 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool _littleWidget = false;
+  bool _showHelp = true;
+  bool _colorActivated = false;
   bool _settingsButton = true;
-  String _jsonString = "file_error";
   String _result = "noFile";
   String _code;
   bool _codeAvailable = false;
+  Map<String, dynamic> _json;
 
   void _showOverlay(BuildContext context) async {
       final code = await Navigator.push(
         context,
         // Create the QROverlay in the next step.
-        MaterialPageRoute(builder: (context) => QROverlay())
-      );
+        PageRouteBuilder(
+          opaque: false,
+          pageBuilder: (context, animation, secondaryAnimation) {
+            return Material(
+              color: Colors.white,
+              
+              type: MaterialType.transparency,
+              // make sure that the overlay content is not cut off
+              child: SafeArea(
+                child: buildOverlayContent(context),
+              ),
+            );
+          },
+      ));
       callback(code);
   }
 
@@ -110,28 +88,27 @@ class _MyHomePageState extends State<MyHomePage> {
       if (json == "file_error") {
         setState(() {
           _settingsButton = true;
-          _jsonString = json;
           _result = "noFile";
         });
       } else {
         setState(() {
           _settingsButton = false;
-          _jsonString = json;
+          _json = jsonDecode(json);
           _result = "noCode";
         });
       }
     });
   }
-// ############################################################
-// ToDo: Append Strings to File function
-// ToDo: Switch in Header Bar to enable savong of Adresses
-// ToDo: functions to trigger saving of adresses in Parser  
-// ############################################################
+
+
+/// ############################################################
+/// ToDo: Append Strings to File function
+/// ToDo: Switch in Header Bar to enable saving of Adresses
+/// ToDo: functions to trigger saving of adresses in Parser  
+/// ############################################################
 
   void _appendStringToFile(String _stringToParse, bool isScheme) {
     String _originalJson;
-
-
     widget.storage.readJsonStore(false).then((String json) {
       if (json == "file_error"){
 
@@ -139,16 +116,24 @@ class _MyHomePageState extends State<MyHomePage> {
 
       }
     });
-
-
     JsonStorage().writeJsonStore(_stringToParse, true);
   }
 
   Future _getPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey("littleWidget")) {
+    if (prefs.containsKey("littleWidget")){
       setState(() {
         _littleWidget = prefs.getBool("littleWidget");
+      });
+    }
+    if (prefs.containsKey("colorActivated")){
+      setState(() {
+        _colorActivated = prefs.getBool("colorActivated");
+      });
+    }
+    if(prefs.containsKey("showHelp")) {
+      setState(() {
+        _showHelp = prefs.getBool("showHelp");
       });
     }
   }
@@ -162,17 +147,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void callback(String code) {
-      if (code != null) {
-        setState(() {
-          _codeAvailable = true;
-          _code = code;
-        });
-      } else {
-        setState(() {
-          _codeAvailable = false;
-          _result = "noCode";
-        });
-      }
+    if (code != null) {
+      setState(() {
+        _codeAvailable = true;
+        _code = code;
+      });
+    } else {
+      setState(() {
+        _codeAvailable = false;
+        _result = "noCode";
+      });
+    }
   }
 
   void _navigateSettings() async {
@@ -183,54 +168,69 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     _getPrefs();
-    Widget _codeWidget;
+    Widget _centerWidget;
     Widget _body;
     Widget _fab;
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    
     widget.title = AppLocalizations.of(context).translate('title');
 
+
     if (_codeAvailable) {
-      _codeWidget = UaWidget(
-          adress: _code,
-          jsonString: _jsonString
+      if (_json.containsKey("order")) {
+        _centerWidget = ExtendetCodeTranslationWidget(
+          code: _code,
+          scheme: _json,
+          showHelp: _showHelp,
+          colorActivated: _colorActivated,
         );
+      } else {
+        _centerWidget = SimpleCodeTranslationWidget(
+          adress: _code,
+          scheme: _json,
+        );
+      }
+
     } else {
-      _codeWidget = Center(
+      _centerWidget = Center(
           child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(AppLocalizations.of(context).translate(_result)),
+            ListTile(
+              title: Text(AppLocalizations.of(context).translate(_result)),
+              subtitle: Text(AppLocalizations.of(context).translate(_result + "Description")),
+            )
           ],
         ),
       );
     }
 
-    if (_littleWidget) {
-      _body =  new Stack(
-        children: <Widget>[
-          _codeWidget,
-          new Align(
-            alignment: Alignment.bottomRight,
-            child: LittleQrWidget(callback)
-          )
-        ]
-      );
-      _fab = Container();
-    } else {
-      _body = _codeWidget;
-      _fab = _settingsButton ? FloatingActionButton(
+
+    _body = _centerWidget;
+    _fab = Container();
+    if( _settingsButton ){
+      _fab = FloatingActionButton(
         onPressed: () {
           _navigateSettings();
         },
         tooltip: AppLocalizations.of(context).translate("settings"),
         child: Icon(Icons.settings),
         heroTag: 1,
-      ) : FloatingActionButton(
+      );
+    } else if ( _littleWidget ) {
+      _body =  new Stack(
+        children: <Widget>[
+          _centerWidget,
+          new Align(
+            alignment: Alignment.bottomRight,
+            child: ClipRRect(
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(15)),
+              child: LittleQrWidget(callback),
+            )
+          )
+        ]
+      );
+    } else {
+      _fab = FloatingActionButton(
         onPressed: () => _showOverlay(context),
         tooltip: AppLocalizations.of(context).translate("scanCode"),
         child: Icon(Icons.search),
