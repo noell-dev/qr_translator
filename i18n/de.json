@@ -3,7 +3,7 @@
     "noCode": "Kein Code gescannt",
     "noCodeDescription": "Scanne einen Code entweder über den Button unten Rechts oder schalte den Scanner über die Einstellungen dauerhaft ein.",
     "noFile": "Kein Schema installiert",
-    "noFileDescription": "Um diesen Übersetzer nutzen zu können, muss eine JSON Datei geladen werden, welche die Zuordnungen von QR-Code Inhalt zu klartext enthält.",
+    "noFileDescription": "Um diesen Übersetzer nutzen zu können, muss eine JSON Datei geladen werden, welche die Zuordnungen von QR-Code Inhalt zu Klartext enthält.",
     "furtherInfo": "Nähere Informationen gibt es unter http://noell.li",
     "settings": "Einstellungen",
     "scanCode": "Code scannen",

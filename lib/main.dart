@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: "Test", storage: JsonStorage()),
+      home: MyHomePage(title: 'Test', storage: JsonStorage(),),
     );
   }
 }
