@@ -9,8 +9,11 @@ import 'package:qr_translator/localization.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_matomo/flutter_matomo.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+    runApp(MyApp());
+  }
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -31,27 +34,26 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Test', storage: JsonStorage(),),
+      home: Home(storage: JsonStorage(),),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class Home extends StatefulWidget {
   final JsonStorage storage;
 
-  MyHomePage({
+  Home({
     Key key,
-    this.title,
     @required this.storage
   }) : super(key: key);
 
   String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _HomeState createState() => _HomeState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomeState extends State<Home> {
   bool _littleWidget = false;
   bool _showHelp = true;
   bool _colorActivated = false;
@@ -138,12 +140,22 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Future<void> _initMatomo(BuildContext context) async {
+    await FlutterMatomo.initializeTracker('https://stat.noell.li/piwik.php', 3);
+    await FlutterMatomo.trackScreen(context, "Opened");
+  }
+
+  Future<void> _trackCode(String name, String action) async {
+    await FlutterMatomo.trackEventWithName("Home", name, action);
+  }
+
 
   @override
   void initState() {
     super.initState();
     _readJson();
     _getPrefs();
+    _initMatomo(context);
   }
 
   void callback(String code) {
@@ -152,11 +164,13 @@ class _MyHomePageState extends State<MyHomePage> {
         _codeAvailable = true;
         _code = code;
       });
+      _trackCode("ScannerReturned", "code");
     } else {
       setState(() {
         _codeAvailable = false;
         _result = "noCode";
       });
+      _trackCode("ScannerReturned", "noCode");
     }
   }
 
@@ -172,8 +186,6 @@ class _MyHomePageState extends State<MyHomePage> {
     Widget _body;
     Widget _fab;
     
-    widget.title = AppLocalizations.of(context).translate('title');
-
 
     if (_codeAvailable) {
       if (_json.containsKey("order")) {
@@ -240,7 +252,7 @@ class _MyHomePageState extends State<MyHomePage> {
     
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(AppLocalizations.of(context).translate('title')),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.settings),

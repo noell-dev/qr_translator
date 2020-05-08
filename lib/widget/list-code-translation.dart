@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_translator/localization.dart';
+import 'package:flutter_matomo/flutter_matomo.dart';
 
 /// The Widget to slice and display the codes scanned and passed through the QR-Scanner
 /// It expects to strings, adress and jsonString:
@@ -131,6 +132,9 @@ class ExtendetCodeTranslationWidget extends StatelessWidget {
     return _isValid;
   }
 
+  Future<void> _trackCode(String name, String action) async {
+    await FlutterMatomo.trackEventWithName("Home", name, action);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -138,6 +142,7 @@ class ExtendetCodeTranslationWidget extends StatelessWidget {
     int position = 0;
 
     if (!scheme["possible_lengths"].contains(code.length)){
+      _trackCode("CodeTranslation", "Wrong Lenght");
       return ListTile(
           title: Text(
             AppLocalizations.of(context).translate('wronglength'),

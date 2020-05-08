@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_matomo/flutter_matomo.dart';
 
 import 'package:qr_translator/localization.dart';
 import 'package:qr_translator/storage.dart';
 import 'package:qr_translator/widget/qr-scanner.dart';
+
 
 class FormWidget extends StatefulWidget {
   @override
@@ -274,6 +276,11 @@ class _SettingsWidget extends State<SettingsWidget> {
   void initState() {
     super.initState();
     _getPrefs();
+    _initMatomo();
+  }
+
+  Future<void> _initMatomo() async {
+    await FlutterMatomo.trackScreen(context, "Opened");
   }
 
   _launchURL() async {

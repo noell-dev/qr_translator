@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:flutter_matomo/flutter_matomo.dart';
 
 
 const flash_on = "FLASH ON";
@@ -137,6 +137,17 @@ class _CameraView extends State<CameraView> {
   var camStatusImage = cam_on_i;
 
   QRViewController controller;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _initMatomo();
+  }
+
+  Future<void> _initMatomo() async {
+    await FlutterMatomo.trackScreen(context, "Opened");
+  }
 
   @override
   Widget build(BuildContext context) {
