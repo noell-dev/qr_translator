@@ -24,6 +24,8 @@
     "toggleHelpDescription": "Shows a Header-Tile explaining which text means what.",
     "toggleColorActivated": "Activate Colors",
     "toggleColorActivatedDescription": "Shows Colors of found Codes also in the corresponding description.",
+    "toggleOptOut": "Opt-Out of anonymous Statistics",
+    "toggleOptOutDescription": "Stop helping us improving the App and finding Errors. Even tough it is totally anonymous!",
     "schemeSettings": "Schema Settings:",
     "appearanceSettings": "Appearance Settings:",
     "aboutHeader": "About:",

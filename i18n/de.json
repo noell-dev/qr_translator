@@ -24,6 +24,8 @@
     "toggleHelpDescription": "Zeigt eine Kopfzeile, diese zeigt wofür die Felder stehen.",
     "toggleColorActivated": "Farben aktivieren",
     "toggleColorActivatedDescription": "Zeigt die Farben der evtl. gefundenen Codes auch in der zugehörigen Beschreibung.",
+    "toggleOptOut": "Sende keine anonymen Statistiken",
+    "toggleOptOutDescription": "Stoppe deine Hilfe diese App zu verbessern und Fehler zu finden.",
     "schemeSettings": "Schema ändern:",
     "appearanceSettings": "Aussehen ändern:",
     "aboutHeader": "Über:",

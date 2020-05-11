@@ -247,6 +247,7 @@ class _SettingsWidget extends State<SettingsWidget> {
   bool _littleWidget = false;
   bool _colorActivated = false;
   bool _showHelp = true;
+  bool _optOut = false;
 
   Future _toggleValue(name, value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -270,6 +271,19 @@ class _SettingsWidget extends State<SettingsWidget> {
         _showHelp = prefs.getBool("showHelp");
       });
     }
+
+    bool isOptOut = await FlutterMatomo.isOptOut();
+    if (isOptOut != null){
+      setState(() {
+        _optOut = isOptOut;
+      });
+    }
+  }
+
+  Future _toggleOptOut(bool value) async {
+    print(value);
+    String version = await FlutterMatomo.setOptOut(value);
+    print(version);
   }
 
 @override
@@ -280,7 +294,8 @@ class _SettingsWidget extends State<SettingsWidget> {
   }
 
   Future<void> _initMatomo() async {
-    await FlutterMatomo.trackScreen(context, "Opened");
+    String version =  await FlutterMatomo.trackScreen(context, "Opened");
+    print(version);
   }
 
   _launchURL() async {
@@ -358,6 +373,19 @@ class _SettingsWidget extends State<SettingsWidget> {
                 _toggleValue("colorActivated", value);
                 setState(() {
                   _colorActivated = value;
+                });
+              },
+            ),
+            // Toggle Matomo optOut
+            SwitchListTile(
+              
+              title: Text(AppLocalizations.of(context).translate('toggleOptOut')),
+              subtitle: Text(AppLocalizations.of(context).translate('toggleOptOutDescription')),
+              value: _optOut,
+              onChanged: (bool value) {
+                _toggleOptOut(value);
+                setState(() {
+                  _optOut = value;
                 });
               },
             ),
