@@ -3,7 +3,7 @@
     "noCode": "No code scanned",
     "noCodeDescription": "Scan a Code either via the Button in the Bottom-Right or switch the Scanner to always on in the Settings.",
     "noFile": "No scheme provided",
-    "noFileDescription": "To use this Translator a JSON-File has to be loaded, which contains th informations which QR-Code Value corresponds to which Human-Radable Text.",
+    "noFileDescription": "To use this Translator a JSON-File should be loaded, which contains the informations which QR-Code Value corresponds to which Human-Radable Text.",
     "furtherInfo": "Further Information can be found at http://noell.li",
     "settings": "Settings",
     "scanCode": "Scan Code",
@@ -35,5 +35,6 @@
     "clearText": "Clear Text",
     "description": "Description",
     "code": "Code",
-    "wronglength": "Code has a wrong length."
+    "wronglength": "Code has a wrong length:",
+    "codeBesidesNoFile": "But here is what you scanned anyway:"
 }
