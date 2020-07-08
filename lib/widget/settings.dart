@@ -29,7 +29,7 @@ class _FormWidgetState extends State<FormWidget> {
   Color _dataColor = Colors.grey;
   final _controller = TextEditingController();
 
-  void _resetOnChange() {
+  void _refetchOnChange() {
     _fetchScheme(http.Client(), _controller.text);
   }
 
@@ -115,33 +115,33 @@ class _FormWidgetState extends State<FormWidget> {
     super.dispose();
   }
 
-@override
+  @override
   void initState() {
     super.initState();
     _getPrefs();
     _fetchScheme(http.Client(), _adress);
-    _controller.addListener(_resetOnChange);
+    _controller.addListener(_refetchOnChange);
   }
 
   void _showOverlay(BuildContext context) async {
-      final adress = await Navigator.push(
-        context,
-        // Create the QROverlay in the next step.
-        PageRouteBuilder(
-          opaque: false,
-          pageBuilder: (context, animation, secondaryAnimation) {
-            return Material(
-              color: Colors.white,
-              
-              type: MaterialType.transparency,
-              // make sure that the overlay content is not cut off
-              child: SafeArea(
-                child: buildOverlayContent(context),
-              ),
-            );
-          },
-      ));
-      callback(adress);
+    final adress = await Navigator.push(
+      context,
+      // Create the QROverlay in the next step.
+      PageRouteBuilder(
+        opaque: false,
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return Material(
+            color: Colors.white,
+            
+            type: MaterialType.transparency,
+            // make sure that the overlay content is not cut off
+            child: SafeArea(
+              child: qrOverlayContent(context),
+            ),
+          );
+        },
+    ));
+    callback(adress);
   }
 
 
@@ -281,9 +281,7 @@ class _SettingsWidget extends State<SettingsWidget> {
   }
 
   Future _toggleOptOut(bool value) async {
-    print(value);
     String version = await FlutterMatomo.setOptOut(value);
-    print(version);
   }
 
 @override
@@ -295,7 +293,6 @@ class _SettingsWidget extends State<SettingsWidget> {
 
   Future<void> _initMatomo() async {
     String version =  await FlutterMatomo.trackScreen(context, "Opened");
-    print(version);
   }
 
   _launchURL() async {

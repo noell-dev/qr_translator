@@ -14,7 +14,7 @@ const cam_paused = "CAM PAUSED";
 const cam_paused_i = Icon(Icons.play_arrow, color: Colors.white,);
 
 
-Widget buildOverlayContent(BuildContext context) {
+Widget qrOverlayContent(BuildContext context) {
   var screenSize = MediaQuery.of(context).size;
   var width = screenSize.width;
   var height = screenSize.height - 40;

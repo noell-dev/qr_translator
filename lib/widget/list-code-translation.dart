@@ -150,6 +150,7 @@ class ExtendetCodeTranslationWidget extends StatelessWidget {
               fontWeight: FontWeight.bold,
               color: Colors.red),
             ),
+            subtitle: Text(code),
         );
     }
 

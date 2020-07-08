@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
         const Locale('de'), // German
       ],
 
-      title: "Test", //AppLocalizations.of(context).translate('title')
+      title: "QR Translator", //AppLocalizations.of(context).translate('title')
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -47,7 +47,7 @@ class Home extends StatefulWidget {
     @required this.storage
   }) : super(key: key);
 
-  String title;
+  // String title;
 
   @override
   _HomeState createState() => _HomeState();
@@ -57,7 +57,6 @@ class _HomeState extends State<Home> {
   bool _littleWidget = false;
   bool _showHelp = true;
   bool _colorActivated = false;
-  bool _settingsButton = true;
   String _result = "noFile";
   String _code;
   bool _codeAvailable = false;
@@ -76,7 +75,7 @@ class _HomeState extends State<Home> {
               type: MaterialType.transparency,
               // make sure that the overlay content is not cut off
               child: SafeArea(
-                child: buildOverlayContent(context),
+                child: qrOverlayContent(context),
               ),
             );
           },
@@ -89,12 +88,10 @@ class _HomeState extends State<Home> {
     widget.storage.readJsonStore(true).then((String json) {
       if (json == "file_error") {
         setState(() {
-          _settingsButton = true;
           _result = "noFile";
         });
       } else {
         setState(() {
-          _settingsButton = false;
           _json = jsonDecode(json);
           _result = "noCode";
         });
@@ -109,17 +106,17 @@ class _HomeState extends State<Home> {
 /// ToDo: functions to trigger saving of adresses in Parser  
 /// ############################################################
 
-  void _appendStringToFile(String _stringToParse, bool isScheme) {
-    String _originalJson;
-    widget.storage.readJsonStore(false).then((String json) {
-      if (json == "file_error"){
+  // void _appendStringToFile(String _stringToParse, bool isScheme) {
+  //   String _originalJson;
+  //   widget.storage.readJsonStore(false).then((String json) {
+  //     if (json == "file_error"){
 
-      } else {
+  //     } else {
 
-      }
-    });
-    JsonStorage().writeJsonStore(_stringToParse, true);
-  }
+  //     }
+  //   });
+  //   JsonStorage().writeJsonStore(_stringToParse, true);
+  // }
 
   Future _getPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -188,20 +185,38 @@ class _HomeState extends State<Home> {
     
 
     if (_codeAvailable) {
-      if (_json.containsKey("order")) {
-        _centerWidget = ExtendetCodeTranslationWidget(
-          code: _code,
-          scheme: _json,
-          showHelp: _showHelp,
-          colorActivated: _colorActivated,
-        );
+      if (_result == "noFile") {
+        _centerWidget = Center(
+          child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            ListTile(
+              title: Text(AppLocalizations.of(context).translate(_result)),
+              subtitle: Text(AppLocalizations.of(context).translate(_result + "Description")),
+            ),
+            Divider(),
+            ListTile(
+              title: Text(AppLocalizations.of(context).translate("codeBesidesNoFile")),
+            ),
+            Text("$_code")
+          ],
+        ),
+      );
       } else {
-        _centerWidget = SimpleCodeTranslationWidget(
-          adress: _code,
-          scheme: _json,
-        );
+        if (_json.containsKey("order")) {
+          _centerWidget = ExtendetCodeTranslationWidget(
+            code: _code,
+            scheme: _json,
+            showHelp: _showHelp,
+            colorActivated: _colorActivated,
+          );
+        } else {
+          _centerWidget = SimpleCodeTranslationWidget(
+            adress: _code,
+            scheme: _json,
+          );
+        }
       }
-
     } else {
       _centerWidget = Center(
           child: Column(
@@ -219,16 +234,7 @@ class _HomeState extends State<Home> {
 
     _body = _centerWidget;
     _fab = Container();
-    if( _settingsButton ){
-      _fab = FloatingActionButton(
-        onPressed: () {
-          _navigateSettings();
-        },
-        tooltip: AppLocalizations.of(context).translate("settings"),
-        child: Icon(Icons.settings),
-        heroTag: 1,
-      );
-    } else if ( _littleWidget ) {
+    if ( _littleWidget ) {
       _body =  new Stack(
         children: <Widget>[
           _centerWidget,
