@@ -13,6 +13,8 @@ const cam_on_i = Icon(Icons.pause, color: Colors.white,);
 const cam_paused = "CAM PAUSED";
 const cam_paused_i = Icon(Icons.play_arrow, color: Colors.white,);
 
+/// ###################### QR-Overlay ######################
+/// Overlay with an QR-Scanner
 
 Widget qrOverlayContent(BuildContext context) {
   var screenSize = MediaQuery.of(context).size;
@@ -46,6 +48,42 @@ Widget qrOverlayContent(BuildContext context) {
   );
 }
 
+/// ###################### QR-Widget ######################
+/// Used for the Overlay
+
+class QrWidget extends StatefulWidget {
+  @override
+  _QrWidget createState() => _QrWidget();
+}
+
+class _QrWidget extends State<QrWidget> {
+
+  void callback(String code) {
+    Future.delayed(Duration.zero, () {
+      Navigator.of(context).pop(code);
+    });
+  }
+
+  QRViewController controller;
+
+  List<Widget> camChildren;
+
+  @override
+  Widget build(BuildContext context) {
+    return  Column(
+      children: <Widget>[
+      // Camera (QR-Scan) Widget
+      Expanded(
+        flex: 5,
+        child:  CameraView(callback)
+      ),
+    ],
+    );
+  }
+}
+
+/// ###################### Little QR-Widget ######################
+/// Used for the little Scanner in the Corner
 
 class LittleQrWidget extends StatefulWidget {
   Function callback;
@@ -79,44 +117,9 @@ class _LittleQrWidget extends State<LittleQrWidget> {
   }
 }
 
-
-class QrWidget extends StatefulWidget {
-  @override
-  _QrWidget createState() => _QrWidget();
-}
-
-
-class _QrWidget extends State<QrWidget> {
-  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-
-  void callback(String code) {
-    Future.delayed(Duration.zero, () {
-      Navigator.of(context).pop(code);
-    });
-      
-  }
-
-  QRViewController controller;
-
-  List<Widget> camChildren;
-
-  @override
-  Widget build(BuildContext context) {
-    return  Column(
-      children: <Widget>[
-      // Camera (QR-Scan) Widget
-      Expanded(
-        flex: 5,
-        child:  CameraView(callback)
-      ),
-    ],
-    );
-  }
-}
-
-// ###########################################
-// ###    Camera View with Controls        ###
-// ###########################################
+/// ###################### Camera View Widget ######################
+/// 
+/// 
 
 class CameraView extends StatefulWidget {
   Function callback;
@@ -129,7 +132,7 @@ class CameraView extends StatefulWidget {
 
 
 class _CameraView extends State<CameraView> {
-  var qr_text = null;
+  var qrText;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   var flashState = flash_on;
   var flashImage = flash_on_i;
@@ -140,14 +143,42 @@ class _CameraView extends State<CameraView> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _initMatomo();
+  }
+
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
   }
 
   Future<void> _initMatomo() async {
     await FlutterMatomo.trackScreen(context, "Opened");
   }
+
+  // Check if flash is on
+  _isFlashOn(String current) {
+    return flash_on == current;
+  }
+
+  // Check if Camera is paused
+  _isCameraPaused(String current) {
+    return cam_paused == current;
+  }
+
+  void _onQRViewCreated(QRViewController controller) {
+    this.controller = controller;
+    controller.scannedDataStream.listen((scanData) {
+      if (scanData != null) {
+        if (qrText != scanData){
+          this.widget.callback(scanData);
+          this.qrText = scanData;
+        }
+      }
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -219,31 +250,5 @@ class _CameraView extends State<CameraView> {
         )
       ]
     );
-  }
-
-  void _onQRViewCreated(QRViewController controller) {
-    this.controller = controller;
-    controller.scannedDataStream.listen((scanData) {
-      if (scanData != null) {
-        if (qr_text != scanData){
-          this.widget.callback(scanData);
-          this.qr_text = scanData;
-        }
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    controller?.dispose();
-    super.dispose();
-  }
-
-  _isFlashOn(String current) {
-    return flash_on == current;
-  }
-
-  _isCameraPaused(String current) {
-    return cam_paused == current;
   }
 }
