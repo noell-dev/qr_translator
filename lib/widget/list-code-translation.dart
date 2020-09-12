@@ -11,6 +11,8 @@ import 'package:flutter_matomo/flutter_matomo.dart';
 /// All the translation work is also done within the build method,
 /// maybe this should be threaded into another non-UI method if the UI becomes slow with huge strings and JSON files.
 /// ToDo: Test for performance in huge definitions
+/// 
+
 class SimpleCodeTranslationWidget extends StatelessWidget {
 
   final String adress;
