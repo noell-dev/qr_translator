@@ -5,20 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_matomo/flutter_matomo.dart';
 
 import 'package:qr_translator/localization.dart';
 import 'package:qr_translator/storage.dart';
 import 'package:qr_translator/widget/qr-scanner.dart';
 
-
 /// ###################### Main Settings Widget ##########################################
-/// 
-/// 
+///
+///
 
 class SettingsWidget extends StatefulWidget {
-
-  
   _SettingsWidget createState() => _SettingsWidget();
 }
 
@@ -26,7 +22,6 @@ class _SettingsWidget extends State<SettingsWidget> {
   bool _littleWidget = false;
   bool _colorActivated = false;
   bool _showHelp = true;
-  bool _optOut = false;
 
   bool _newVersionAvailable = false;
   bool _adressCorrect = false;
@@ -47,7 +42,6 @@ class _SettingsWidget extends State<SettingsWidget> {
     _getPrefs();
     _fetchScheme(http.Client(), _adress);
     _controller.addListener(_refetchOnChange);
-    _trackPageview();
   }
 
   @override
@@ -60,55 +54,38 @@ class _SettingsWidget extends State<SettingsWidget> {
   /// Get SharedPreferences and OptOut Status
   Future _getPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey("littleWidget")){
+    if (prefs.containsKey("littleWidget")) {
       setState(() {
         _littleWidget = prefs.getBool("littleWidget");
       });
     }
-    if (prefs.containsKey("colorActivated")){
+    if (prefs.containsKey("colorActivated")) {
       setState(() {
         _colorActivated = prefs.getBool("colorActivated");
       });
     }
-    if(prefs.containsKey("showHelp")) {
+    if (prefs.containsKey("showHelp")) {
       setState(() {
         _showHelp = prefs.getBool("showHelp");
       });
     }
-    if(prefs.containsKey("adress")) {
+    if (prefs.containsKey("adress")) {
       setState(() {
         _adress = prefs.getString("adress");
         _controller.text = _adress;
       });
     }
-    if(prefs.containsKey("localVersion")) {
+    if (prefs.containsKey("localVersion")) {
       setState(() {
         _localVersion = prefs.getString('localVersion');
       });
     }
-
-    bool isOptOut = await FlutterMatomo.isOptOut();
-    if (isOptOut != null){
-      setState(() {
-        _optOut = isOptOut;
-      });
-    }
   }
-  
+
   /// toggle a single Value of the SharedPreferences
   Future _toggleValue(name, value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool(name, value);
-  }
-  
-  /// Track the Pageview with Matomo if not OptOut
-  Future<void> _trackPageview() async {
-    await FlutterMatomo.trackScreen(context, "Opened");
-  }
-
-  /// Toggle the Optout of the Matomo Tracking
-  Future _toggleOptOut(bool value) async {
-    await FlutterMatomo.setOptOut(value);
   }
 
   /// Launch the Predefined URL in a Browser
@@ -162,7 +139,9 @@ class _SettingsWidget extends State<SettingsWidget> {
           throw FormatException();
         }
 
-        var _compare = _localVersion != _decoded['Version']; // maybe switch _localVersion for await prefs.getString('localVersion')
+        var _compare = _localVersion !=
+            _decoded[
+                'Version']; // maybe switch _localVersion for await prefs.getString('localVersion')
         await prefs.setString('adress', adress);
         setState(() {
           if (_compare) {
@@ -176,7 +155,7 @@ class _SettingsWidget extends State<SettingsWidget> {
           _decodedJson = _decoded;
           _newVersionAvailable = _compare;
           _adressCorrect = true;
-        }); 
+        });
       } on FormatException {
         setState(() {
           _dataColor = Colors.red;
@@ -189,29 +168,29 @@ class _SettingsWidget extends State<SettingsWidget> {
         _dataColor = Colors.red;
         _error = AppLocalizations.of(context).translate('adressError');
         _adressCorrect = false;
-      }); 
+      });
     }
   }
-  
+
   /// QR-Scanner Overlay to Scan a code with a URL to schemes
   void _showOverlay(BuildContext context) async {
     final adress = await Navigator.push(
-      context,
-      // Create the QROverlay in the next step.
-      PageRouteBuilder(
-        opaque: false,
-        pageBuilder: (context, animation, secondaryAnimation) {
-          return Material(
-            color: Colors.white,
-            
-            type: MaterialType.transparency,
-            // make sure that the overlay content is not cut off
-            child: SafeArea(
-              child: qrOverlayContent(context),
-            ),
-          );
-        },
-    ));
+        context,
+        // Create the QROverlay in the next step.
+        PageRouteBuilder(
+          opaque: false,
+          pageBuilder: (context, animation, secondaryAnimation) {
+            return Material(
+              color: Colors.white,
+
+              type: MaterialType.transparency,
+              // make sure that the overlay content is not cut off
+              child: SafeArea(
+                child: qrOverlayContent(context),
+              ),
+            );
+          },
+        ));
     callback(adress);
   }
 
@@ -225,24 +204,36 @@ class _SettingsWidget extends State<SettingsWidget> {
       _fetchScheme(http.Client(), this._adress);
     }
   }
-  
+
   @override
-  Widget build (BuildContext context) {
+  Widget build(BuildContext context) {
     var _width = MediaQuery.of(context).size.width;
     var _button;
-    
+
     // Check if a new Version is Available and change Button according
-    if ( _newVersionAvailable ) {
-      _button = RaisedButton(
-        color: _dataColor,
+    if (_newVersionAvailable) {
+      _button = ElevatedButton(
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.resolveWith<Color>(
+            (Set<MaterialState> states) {
+              return _dataColor; // Use the component's default.
+            },
+          ),
+        ),
         onPressed: () {
           _updateLocalScheme();
         },
         child: Text(AppLocalizations.of(context).translate('activateVersion')),
       );
     } else {
-      _button = RaisedButton(
-        color: _dataColor,
+      _button = ElevatedButton(
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.resolveWith<Color>(
+            (Set<MaterialState> states) {
+              return _dataColor; // Use the component's default.
+            },
+          ),
+        ),
         onPressed: () {
           setState(() {
             this._adress = _controller.text;
@@ -253,7 +244,6 @@ class _SettingsWidget extends State<SettingsWidget> {
       );
     }
 
-
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -261,164 +251,156 @@ class _SettingsWidget extends State<SettingsWidget> {
         title: Text(AppLocalizations.of(context).translate('settings')),
       ),
       body: Center(
-        child: ListView(
-          children: <Widget>[
-            // Header for "Scheme Settings"
-            ListTile(
-              title: Text(
-                AppLocalizations.of(context).translate('schemeSettings'),
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+          child: ListView(children: <Widget>[
+        // Header for "Scheme Settings"
+        ListTile(
+          title: Text(
+            AppLocalizations.of(context).translate('schemeSettings'),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          subtitle: Text(AppLocalizations.of(context).translate('enterAdress')),
+        ),
+        // Form with TextController to update Schemes
+        Form(
+          key: _formKey,
+          child: Column(
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 15),
+                child: TextField(
+                  decoration: InputDecoration(
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.camera_alt),
+                      onPressed: () {
+                        _showOverlay(context);
+                      },
+                    ),
+                    border: OutlineInputBorder(),
+                    labelText: AppLocalizations.of(context)
+                        .translate('descriptionToAdress'),
+                  ),
+                  controller: _controller,
                 ),
               ),
-              subtitle: Text(AppLocalizations.of(context).translate('enterAdress')),
-            ),
-            // Form with TextController to update Schemes
-            Form(
-              key: _formKey,
-              child: Column(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.camera_alt),
-                          onPressed: () {
-                            _showOverlay(context);
-                          },
-                        ),
-                        border: OutlineInputBorder(),
-                        labelText: AppLocalizations.of(context).translate('descriptionToAdress'),
-                      ),
-                      controller: _controller,
+                    width: _width / 2,
+                    padding: EdgeInsets.all(15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(_error, style: TextStyle(color: _dataColor)),
+                        Text(
+                            "${AppLocalizations.of(context).translate('localVersion')}: ${this._localVersion ?? "---"}"),
+                        this._adressCorrect
+                            ? Text(
+                                "${AppLocalizations.of(context).translate('onlineVersion')}: ${this._decodedJson['Version']}")
+                            : Text(
+                                "${AppLocalizations.of(context).translate('onlineVersion')}: ---"),
+                      ],
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Container(
-                        width: _width / 2,
-                        padding: EdgeInsets.all(15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              _error,
-                              style: TextStyle(color: _dataColor)
-                            ),
-                            Text("${AppLocalizations.of(context).translate('localVersion')}: ${this._localVersion ?? "---"}"),
-                            this._adressCorrect ? Text("${AppLocalizations.of(context).translate('onlineVersion')}: ${this._decodedJson['Version']}") : Text("${AppLocalizations.of(context).translate('onlineVersion')}: ---"),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        width: _width /2,
-                        padding: EdgeInsets.all(15),
-                        child: _button,
-                      ),
-                    ],
+                  Container(
+                    width: _width / 2,
+                    padding: EdgeInsets.all(15),
+                    child: _button,
                   ),
                 ],
               ),
+            ],
+          ),
+        ),
+        Divider(),
+        // Header for "Appearance Settings"
+        ListTile(
+          title: Text(
+            AppLocalizations.of(context).translate('appearanceSettings'),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
-            Divider(),
-            // Header for "Appearance Settings"
-            ListTile(
-              title: Text(
-                AppLocalizations.of(context).translate('appearanceSettings'),
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+          ),
+        ),
+        // Toggle littleWidget
+        SwitchListTile(
+          title: Text(
+              AppLocalizations.of(context).translate('toggleLittleWidget')),
+          subtitle: Text(AppLocalizations.of(context)
+              .translate('toggleLittleWidgetDescription')),
+          value: _littleWidget,
+          onChanged: (bool value) {
+            _toggleValue("littleWidget", value);
+            setState(() {
+              _littleWidget = value;
+            });
+          },
+        ),
+        // Toggle Help
+        SwitchListTile(
+          title: Text(AppLocalizations.of(context).translate('toggleHelp')),
+          subtitle: Text(
+              AppLocalizations.of(context).translate('toggleHelpDescription')),
+          value: _showHelp,
+          onChanged: (bool value) {
+            _toggleValue("showHelp", value);
+            setState(() {
+              _showHelp = value;
+            });
+          },
+        ),
+        // Toggle colorful
+        SwitchListTile(
+          title: Text(
+              AppLocalizations.of(context).translate('toggleColorActivated')),
+          subtitle: Text(AppLocalizations.of(context)
+              .translate('toggleColorActivatedDescription')),
+          value: _colorActivated,
+          onChanged: (bool value) {
+            _toggleValue("colorActivated", value);
+            setState(() {
+              _colorActivated = value;
+            });
+          },
+        ),
+
+        // About Area and Links
+        ListTile(
+          title: Text(
+            AppLocalizations.of(context).translate('aboutHeader'),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
-            // Toggle littleWidget
-            SwitchListTile(
-              title: Text(AppLocalizations.of(context).translate('toggleLittleWidget')),
-              subtitle: Text(AppLocalizations.of(context).translate('toggleLittleWidgetDescription')),
-              value: _littleWidget,
-              onChanged: (bool value) {
-                _toggleValue("littleWidget", value);
-                setState(() {
-                  _littleWidget = value;
-                });
-              },
-            ),
-            // Toggle Help
-            SwitchListTile(
-              title: Text(AppLocalizations.of(context).translate('toggleHelp')),
-              subtitle: Text(AppLocalizations.of(context).translate('toggleHelpDescription')),
-              value: _showHelp,
-              onChanged: (bool value) {
-                _toggleValue("showHelp", value);
-                setState(() {
-                  _showHelp = value;
-                });
-              },
-            ),
-            // Toggle colorful
-            SwitchListTile(
-              title: Text(AppLocalizations.of(context).translate('toggleColorActivated')),
-              subtitle: Text(AppLocalizations.of(context).translate('toggleColorActivatedDescription')),
-              value: _colorActivated,
-              onChanged: (bool value) {
-                _toggleValue("colorActivated", value);
-                setState(() {
-                  _colorActivated = value;
-                });
-              },
-            ),
-            // Toggle Matomo optOut
-            SwitchListTile(
-              
-              title: Text(AppLocalizations.of(context).translate('toggleOptOut')),
-              subtitle: Text(AppLocalizations.of(context).translate('toggleOptOutDescription')),
-              value: _optOut,
-              onChanged: (bool value) {
-                _toggleOptOut(value);
-                setState(() {
-                  _optOut = value;
-                });
-              },
-            ),
-            Divider(),
-            // About Area and Links
-            ListTile(
-              title: Text(
-                AppLocalizations.of(context).translate('aboutHeader'),
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.all(15),
-              child: Text(
-                AppLocalizations.of(context).translate('licence'),
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.all(15),
+          child: Text(
+            AppLocalizations.of(context).translate('licence'),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          child: Column(
+            children: <Widget>[
+              Text(
+                AppLocalizations.of(context).translate('about'),
                 textAlign: TextAlign.center,
               ),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              child: Column(
-                children: <Widget>[
-                  Text(
-                    AppLocalizations.of(context).translate('about'),
-                    textAlign: TextAlign.center,
-                  ),
-                  RaisedButton(
-                    child: Text("noell.li"),
-                    onPressed: () => _launchURL(),
-                  )
-                ],
-              ),
-            ),
-          ]
-        )
-      ),
+              ElevatedButton(
+                child: Text("noell.li"),
+                onPressed: () => _launchURL(),
+              )
+            ],
+          ),
+        ),
+      ])),
     );
   }
 }

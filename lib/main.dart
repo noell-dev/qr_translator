@@ -9,11 +9,10 @@ import 'package:qr_translator/localization.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_matomo/flutter_matomo.dart';
 
 void main() async {
-    runApp(MyApp());
-  }
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -34,7 +33,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Home(storage: JsonStorage(),),
+      home: Home(
+        storage: JsonStorage(),
+      ),
     );
   }
 }
@@ -42,10 +43,7 @@ class MyApp extends StatelessWidget {
 class Home extends StatefulWidget {
   final JsonStorage storage;
 
-  Home({
-    Key key,
-    @required this.storage
-  }) : super(key: key);
+  Home({Key key, @required this.storage}) : super(key: key);
 
   // String title;
 
@@ -63,7 +61,7 @@ class _HomeState extends State<Home> {
   Map<String, dynamic> _json;
 
   void _showOverlay(BuildContext context) async {
-      final code = await Navigator.push(
+    final code = await Navigator.push(
         context,
         // Create the QROverlay in the next step.
         PageRouteBuilder(
@@ -71,7 +69,7 @@ class _HomeState extends State<Home> {
           pageBuilder: (context, animation, secondaryAnimation) {
             return Material(
               color: Colors.white,
-              
+
               type: MaterialType.transparency,
               // make sure that the overlay content is not cut off
               child: SafeArea(
@@ -79,10 +77,9 @@ class _HomeState extends State<Home> {
               ),
             );
           },
-      ));
-      callback(code);
+        ));
+    callback(code);
   }
-
 
   void _readJson() {
     widget.storage.readJsonStore(true).then((String json) {
@@ -99,12 +96,11 @@ class _HomeState extends State<Home> {
     });
   }
 
-
-/// ############################################################
-/// ToDo: Append Strings to File function
-/// ToDo: Switch in Header Bar to enable saving of Adresses
-/// ToDo: functions to trigger saving of adresses in Parser  
-/// ############################################################
+  /// ############################################################
+  /// ToDo: Append Strings to File function
+  /// ToDo: Switch in Header Bar to enable saving of Adresses
+  /// ToDo: functions to trigger saving of adresses in Parser
+  /// ############################################################
 
   // void _appendStringToFile(String _stringToParse, bool isScheme) {
   //   String _originalJson;
@@ -120,39 +116,28 @@ class _HomeState extends State<Home> {
 
   Future _getPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey("littleWidget")){
+    if (prefs.containsKey("littleWidget")) {
       setState(() {
         _littleWidget = prefs.getBool("littleWidget");
       });
     }
-    if (prefs.containsKey("colorActivated")){
+    if (prefs.containsKey("colorActivated")) {
       setState(() {
         _colorActivated = prefs.getBool("colorActivated");
       });
     }
-    if(prefs.containsKey("showHelp")) {
+    if (prefs.containsKey("showHelp")) {
       setState(() {
         _showHelp = prefs.getBool("showHelp");
       });
     }
   }
 
-  Future<void> _initMatomo(BuildContext context) async {
-    await FlutterMatomo.initializeTracker('https://stat.noell.li/piwik.php', 3);
-    await FlutterMatomo.trackScreen(context, "Opened");
-  }
-
-  Future<void> _trackCode(String name, String action) async {
-    await FlutterMatomo.trackEventWithName("Home", name, action);
-  }
-
-
   @override
   void initState() {
     super.initState();
     _readJson();
     _getPrefs();
-    _initMatomo(context);
   }
 
   void callback(String code) {
@@ -161,18 +146,17 @@ class _HomeState extends State<Home> {
         _codeAvailable = true;
         _code = code;
       });
-      _trackCode("ScannerReturned", "code");
     } else {
       setState(() {
         _codeAvailable = false;
         _result = "noCode";
       });
-      _trackCode("ScannerReturned", "noCode");
     }
   }
 
   void _navigateSettings() async {
-    await Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsWidget()));
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => SettingsWidget()));
     _readJson();
   }
 
@@ -182,26 +166,27 @@ class _HomeState extends State<Home> {
     Widget _centerWidget;
     Widget _body;
     Widget _fab;
-    
 
     if (_codeAvailable) {
       if (_result == "noFile") {
         _centerWidget = Center(
           child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            ListTile(
-              title: Text(AppLocalizations.of(context).translate(_result)),
-              subtitle: Text(AppLocalizations.of(context).translate(_result + "Description")),
-            ),
-            Divider(),
-            ListTile(
-              title: Text(AppLocalizations.of(context).translate("codeBesidesNoFile")),
-            ),
-            Text("$_code")
-          ],
-        ),
-      );
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              ListTile(
+                title: Text(AppLocalizations.of(context).translate(_result)),
+                subtitle: Text(AppLocalizations.of(context)
+                    .translate(_result + "Description")),
+              ),
+              Divider(),
+              ListTile(
+                title: Text(AppLocalizations.of(context)
+                    .translate("codeBesidesNoFile")),
+              ),
+              Text("$_code")
+            ],
+          ),
+        );
       } else {
         if (_json.containsKey("order")) {
           _centerWidget = ExtendetCodeTranslationWidget(
@@ -219,34 +204,31 @@ class _HomeState extends State<Home> {
       }
     } else {
       _centerWidget = Center(
-          child: Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             ListTile(
               title: Text(AppLocalizations.of(context).translate(_result)),
-              subtitle: Text(AppLocalizations.of(context).translate(_result + "Description")),
+              subtitle: Text(AppLocalizations.of(context)
+                  .translate(_result + "Description")),
             )
           ],
         ),
       );
     }
 
-
     _body = _centerWidget;
     _fab = Container();
-    if ( _littleWidget ) {
-      _body =  new Stack(
-        children: <Widget>[
-          _centerWidget,
-          new Align(
+    if (_littleWidget) {
+      _body = new Stack(children: <Widget>[
+        _centerWidget,
+        new Align(
             alignment: Alignment.bottomRight,
             child: ClipRRect(
               borderRadius: BorderRadius.only(topLeft: Radius.circular(15)),
               child: LittleQrWidget(callback),
-            )
-          )
-        ]
-      );
+            ))
+      ]);
     } else {
       _fab = FloatingActionButton(
         onPressed: () => _showOverlay(context),
@@ -255,7 +237,7 @@ class _HomeState extends State<Home> {
         heroTag: 1,
       );
     }
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context).translate('title')),
@@ -268,7 +250,7 @@ class _HomeState extends State<Home> {
           )
         ],
       ),
-      body: _body, 
+      body: _body,
       floatingActionButton: _fab,
     );
   }
