@@ -1,17 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:flutter_matomo/flutter_matomo.dart';
-
 
 const flash_on = "FLASH ON";
-const flash_on_i = Icon(Icons.flash_on, color: Colors.white,);
+const flash_on_i = Icon(
+  Icons.flash_on,
+  color: Colors.white,
+);
 const flash_off = "FLASH OFF";
-const flash_off_i = Icon(Icons.flash_off, color: Colors.white,);
+const flash_off_i = Icon(
+  Icons.flash_off,
+  color: Colors.white,
+);
 
 const cam_on = "CAM ON";
-const cam_on_i = Icon(Icons.pause, color: Colors.white,);
+const cam_on_i = Icon(
+  Icons.pause,
+  color: Colors.white,
+);
 const cam_paused = "CAM PAUSED";
-const cam_paused_i = Icon(Icons.play_arrow, color: Colors.white,);
+const cam_paused_i = Icon(
+  Icons.play_arrow,
+  color: Colors.white,
+);
 
 /// ###################### QR-Overlay ######################
 /// Overlay with an QR-Scanner
@@ -33,13 +43,12 @@ Widget qrOverlayContent(BuildContext context) {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Container(
-                width: orientation == Orientation.landscape ? height : width,
-                height: orientation == Orientation.landscape ? height : width,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(30),
-                  child: QrWidget(),
-                )
-              ),
+                  width: orientation == Orientation.landscape ? height : width,
+                  height: orientation == Orientation.landscape ? height : width,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(30),
+                    child: QrWidget(),
+                  )),
             ],
           ),
         ),
@@ -57,7 +66,6 @@ class QrWidget extends StatefulWidget {
 }
 
 class _QrWidget extends State<QrWidget> {
-
   void callback(String code) {
     Future.delayed(Duration.zero, () {
       Navigator.of(context).pop(code);
@@ -70,14 +78,11 @@ class _QrWidget extends State<QrWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return  Column(
+    return Column(
       children: <Widget>[
-      // Camera (QR-Scan) Widget
-      Expanded(
-        flex: 5,
-        child:  CameraView(callback)
-      ),
-    ],
+        // Camera (QR-Scan) Widget
+        Expanded(flex: 5, child: CameraView(callback)),
+      ],
     );
   }
 }
@@ -94,9 +99,7 @@ class LittleQrWidget extends StatefulWidget {
   _LittleQrWidget createState() => _LittleQrWidget();
 }
 
-
 class _LittleQrWidget extends State<LittleQrWidget> {
-
   void callback(String code) {
     this.widget.callback(code);
   }
@@ -106,20 +109,18 @@ class _LittleQrWidget extends State<LittleQrWidget> {
     var screenSize = MediaQuery.of(context).size;
     var width = screenSize.width;
     var height = screenSize.height;
-    return OrientationBuilder(
-    builder: (context, orientation) {
+    return OrientationBuilder(builder: (context, orientation) {
       return Container(
-            width: orientation == Orientation.portrait ? width/2 : height/2,
-            height: orientation == Orientation.portrait ? width/2 : height/2,
-            child: CameraView(callback)
-          );
+          width: orientation == Orientation.portrait ? width / 2 : height / 2,
+          height: orientation == Orientation.portrait ? width / 2 : height / 2,
+          child: CameraView(callback));
     });
   }
 }
 
 /// ###################### Camera View Widget ######################
-/// 
-/// 
+///
+///
 
 class CameraView extends StatefulWidget {
   Function callback;
@@ -129,7 +130,6 @@ class CameraView extends StatefulWidget {
   @override
   _CameraView createState() => _CameraView();
 }
-
 
 class _CameraView extends State<CameraView> {
   var qrText;
@@ -144,17 +144,12 @@ class _CameraView extends State<CameraView> {
   @override
   void initState() {
     super.initState();
-    _initMatomo();
   }
 
   @override
   void dispose() {
     controller?.dispose();
     super.dispose();
-  }
-
-  Future<void> _initMatomo() async {
-    await FlutterMatomo.trackScreen(context, "Opened");
   }
 
   // Check if flash is on
@@ -171,7 +166,7 @@ class _CameraView extends State<CameraView> {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
       if (scanData != null) {
-        if (qrText != scanData){
+        if (qrText != scanData) {
           this.widget.callback(scanData);
           this.qrText = scanData;
         }
@@ -179,76 +174,74 @@ class _CameraView extends State<CameraView> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        QRView(
-          key: qrKey,
-          onQRViewCreated: _onQRViewCreated,
-        ),
-        Align(
+    return Stack(children: <Widget>[
+      QRView(
+        key: qrKey,
+        onQRViewCreated: _onQRViewCreated,
+      ),
+      Align(
           alignment: Alignment.topCenter,
           child: Container(
-            color: Colors.black.withOpacity(0.2),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                IconButton(
-                  icon: flashImage,
-                  onPressed: () {
-                  if (controller != null) {
-                    controller.toggleFlash();
-                    if (_isFlashOn(flashState)) {
-                      setState(() {
-                        flashState = flash_off;
-                        flashImage = flash_off_i;
-                      });
-                    } else {
-                      setState(() {
-                        flashState = flash_on;
-                        flashImage = flash_on_i;
-                      });
-                    }
-                  }
-                },
-                ),
-                IconButton(
-                  icon: camStatusImage,
-                  onPressed: () {
-                    if(_isCameraPaused(camStatus)){
-                      controller?.resumeCamera();
-                      setState(() {
-                        camStatus = cam_on;
-                        camStatusImage = cam_on_i;
-                      });
-                    } else {
-                      controller?.pauseCamera();
-                      setState(() {
-                        camStatus = cam_paused;
-                        camStatusImage = cam_paused_i;
-                      });
-                    }
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.switch_camera, color: Colors.white,),
-                  onPressed: () {
-                    if (controller != null) {
-                      controller.flipCamera();
-                      setState(() {
-                        camStatus = cam_on;
-                        camStatusImage = cam_on_i;
-                      });
-                    }
-                  },
-                )
-              ],
-            )
-          )
-        )
-      ]
-    );
+              color: Colors.black.withOpacity(0.2),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  IconButton(
+                    icon: flashImage,
+                    onPressed: () {
+                      if (controller != null) {
+                        controller.toggleFlash();
+                        if (_isFlashOn(flashState)) {
+                          setState(() {
+                            flashState = flash_off;
+                            flashImage = flash_off_i;
+                          });
+                        } else {
+                          setState(() {
+                            flashState = flash_on;
+                            flashImage = flash_on_i;
+                          });
+                        }
+                      }
+                    },
+                  ),
+                  IconButton(
+                    icon: camStatusImage,
+                    onPressed: () {
+                      if (_isCameraPaused(camStatus)) {
+                        controller?.resumeCamera();
+                        setState(() {
+                          camStatus = cam_on;
+                          camStatusImage = cam_on_i;
+                        });
+                      } else {
+                        controller?.pauseCamera();
+                        setState(() {
+                          camStatus = cam_paused;
+                          camStatusImage = cam_paused_i;
+                        });
+                      }
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.switch_camera,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      if (controller != null) {
+                        controller.flipCamera();
+                        setState(() {
+                          camStatus = cam_on;
+                          camStatusImage = cam_on_i;
+                        });
+                      }
+                    },
+                  )
+                ],
+              )))
+    ]);
   }
 }

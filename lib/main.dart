@@ -9,7 +9,6 @@ import 'package:qr_translator/localization.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_matomo/flutter_matomo.dart';
 
 void main() async {
   runApp(MyApp());
@@ -99,7 +98,8 @@ class _HomeState extends State<Home> {
 
   /// ############################################################
   /// ToDo: Append Strings to File function
-  /// ToDo: functions to trigger saving of adresses in Parser ??
+  /// ToDo: Switch in Header Bar to enable saving of Adresses
+  /// ToDo: functions to trigger saving of adresses in Parser
   /// ############################################################
 
   // void _appendStringToFile(String _stringToParse, bool isScheme) {
@@ -133,21 +133,11 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Future<void> _initMatomo(BuildContext context) async {
-    await FlutterMatomo.initializeTracker('https://stat.noell.li/piwik.php', 3);
-    await FlutterMatomo.trackScreen(context, "Opened");
-  }
-
-  Future<void> _trackCode(String name, String action) async {
-    await FlutterMatomo.trackEventWithName("Home", name, action);
-  }
-
   @override
   void initState() {
     super.initState();
     _readJson();
     _getPrefs();
-    _initMatomo(context);
   }
 
   void callback(String code) {
@@ -156,13 +146,11 @@ class _HomeState extends State<Home> {
         _codeAvailable = true;
         _code = code;
       });
-      _trackCode("ScannerReturned", "code");
     } else {
       setState(() {
         _codeAvailable = false;
         _result = "noCode";
       });
-      _trackCode("ScannerReturned", "noCode");
     }
   }
 
