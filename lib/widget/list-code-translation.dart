@@ -157,7 +157,7 @@ class ExtendetCodeTranslationWidget extends StatelessWidget {
     pos = 0;
     Map<String, String> dependet = {};
     for (var code_part in splittedCode) {
-      entries[pos] = new List();
+      entries[pos] = [];
       position = 0;
       for (var i in newOrder[pos]) {
         int length = parts[i]["length"];
