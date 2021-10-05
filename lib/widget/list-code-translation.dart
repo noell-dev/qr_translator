@@ -16,8 +16,8 @@ class SimpleCodeTranslationWidget extends StatelessWidget {
   final String adress;
   final Map<String, dynamic> scheme;
 
-  final fields = new List();
-  final colors = new List();
+  final fields = [];
+  final colors = [];
 
   SimpleCodeTranslationWidget({
     Key key,
