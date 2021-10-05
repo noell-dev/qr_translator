@@ -162,13 +162,13 @@ class ExtendetCodeTranslationWidget extends StatelessWidget {
       for (var i in newOrder[pos]) {
         int length = parts[i]["length"];
         var description = parts[i]["description"];
-        var part_substring = code_part.substring(position, position + length);
+        var partSubstring = code_part.substring(position, position + length);
 
         if (parts[i]["dependet_on"]) {
-          dependet[i] = part_substring;
+          dependet[i] = partSubstring;
         }
 
-        if (_validateCode(part_substring, i, dependet)) {
+        if (_validateCode(partSubstring, i, dependet)) {
           var dependsOn = parts[i]["dependsOn"];
           var possibleValues;
           var type = parts[i]["type"];
@@ -179,19 +179,19 @@ class ExtendetCodeTranslationWidget extends StatelessWidget {
             possibleValues = parts[i]["possibleValues"];
           }
           try {
-            clearText = possibleValues[part_substring];
+            clearText = possibleValues[partSubstring];
           } catch (e) {
             clearText = "";
           }
           entries[pos].add(Entry(
-            codePart: part_substring,
+            codePart: partSubstring,
             description: description,
             color: type == "integer" ? Colors.orange : Colors.green,
             clearText: clearText,
           ));
         } else {
           entries[pos].add(Entry(
-            codePart: part_substring,
+            codePart: partSubstring,
             description: description,
             color: Colors.red,
           ));
