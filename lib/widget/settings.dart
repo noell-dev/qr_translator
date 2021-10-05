@@ -130,13 +130,13 @@ class _SettingsWidget extends State<SettingsWidget> {
     }
 
     try {
-      final _response = await http.get(adress);
+      final _response = await http.get(Uri.parse(adress));
       try {
         var _decoded = json.decode(_response.body) as Map<String, dynamic>;
 
         // if the required Key "Version" is not available throw an Exception
         if (_decoded['Version'] == null) {
-          throw FormatException();
+          throw FormatException("no Version field");
         }
 
         var _compare = _localVersion !=
