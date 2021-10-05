@@ -16,8 +16,8 @@ class SimpleCodeTranslationWidget extends StatelessWidget {
   final String adress;
   final Map<String, dynamic> scheme;
 
-  final fields = new List();
-  final colors = new List();
+  final fields = [];
+  final colors = [];
 
   SimpleCodeTranslationWidget({
     Key key,
@@ -96,8 +96,8 @@ class ExtendetCodeTranslationWidget extends StatelessWidget {
     var parts = scheme["parts"];
 
     var type = parts[schemePart]["type"];
-    var depends_on = parts[schemePart]["depends_on"];
-    var possible_values;
+    var dependsOn = parts[schemePart]["dependsOn"];
+    var possibleValues;
 
     bool _isValid = false;
 
@@ -110,14 +110,14 @@ class ExtendetCodeTranslationWidget extends StatelessWidget {
         _isValid = true;
       }
     } else {
-      if (depends_on != null) {
-        possible_values =
-            parts[schemePart]["possible_values"][dependList[depends_on]];
+      if (dependsOn != null) {
+        possibleValues =
+            parts[schemePart]["possibleValues"][dependList[dependsOn]];
       } else {
-        possible_values = parts[schemePart]["possible_values"];
+        possibleValues = parts[schemePart]["possibleValues"];
       }
       try {
-        var value = possible_values[codePart];
+        var value = possibleValues[codePart];
       } catch (e) {
         _isValid = false;
       } finally {
@@ -153,45 +153,45 @@ class ExtendetCodeTranslationWidget extends StatelessWidget {
       }
     }
 
-    var splitted_code = code.split(parts["Trennzeichen"]["possible_values"][0]);
+    var splittedCode = code.split(parts["Trennzeichen"]["possibleValues"][0]);
     pos = 0;
     Map<String, String> dependet = {};
-    for (var code_part in splitted_code) {
-      entries[pos] = new List();
+    for (var code_part in splittedCode) {
+      entries[pos] = [];
       position = 0;
       for (var i in newOrder[pos]) {
         int length = parts[i]["length"];
         var description = parts[i]["description"];
-        var part_substring = code_part.substring(position, position + length);
+        var partSubstring = code_part.substring(position, position + length);
 
         if (parts[i]["dependet_on"]) {
-          dependet[i] = part_substring;
+          dependet[i] = partSubstring;
         }
 
-        if (_validateCode(part_substring, i, dependet)) {
-          var depends_on = parts[i]["depends_on"];
-          var possible_values;
+        if (_validateCode(partSubstring, i, dependet)) {
+          var dependsOn = parts[i]["dependsOn"];
+          var possibleValues;
           var type = parts[i]["type"];
           var clearText;
-          if (depends_on != null) {
-            possible_values = parts[i]["possible_values"][dependet[depends_on]];
+          if (dependsOn != null) {
+            possibleValues = parts[i]["possibleValues"][dependet[dependsOn]];
           } else {
-            possible_values = parts[i]["possible_values"];
+            possibleValues = parts[i]["possibleValues"];
           }
           try {
-            clearText = possible_values[part_substring];
+            clearText = possibleValues[partSubstring];
           } catch (e) {
             clearText = "";
           }
           entries[pos].add(Entry(
-            codePart: part_substring,
+            codePart: partSubstring,
             description: description,
             color: type == "integer" ? Colors.orange : Colors.green,
             clearText: clearText,
           ));
         } else {
           entries[pos].add(Entry(
-            codePart: part_substring,
+            codePart: partSubstring,
             description: description,
             color: Colors.red,
           ));

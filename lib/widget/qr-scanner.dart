@@ -91,7 +91,7 @@ class _QrWidget extends State<QrWidget> {
 /// Used for the little Scanner in the Corner
 
 class LittleQrWidget extends StatefulWidget {
-  Function callback;
+  final Function callback;
 
   LittleQrWidget(this.callback);
 
@@ -123,7 +123,7 @@ class _LittleQrWidget extends State<LittleQrWidget> {
 ///
 
 class CameraView extends StatefulWidget {
-  Function callback;
+  final Function callback;
 
   CameraView(this.callback);
 
